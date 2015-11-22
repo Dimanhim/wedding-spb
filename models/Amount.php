@@ -1,0 +1,60 @@
+<?php
+
+namespace app\models;
+
+use Yii;
+use yii\behaviors\TimestampBehavior;
+
+/**
+ * This is the model class for table "amounts".
+ *
+ * @property integer $id
+ * @property integer $product_id
+ * @property integer $amount_type
+ * @property integer $size_id
+ * @property integer $created_at
+ * @property integer $updated_at
+ */
+class Amount extends \yii\db\ActiveRecord
+{
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return 'amounts';
+    }
+
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::className()
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['product_id', 'amount_type', 'created_at', 'updated_at'], 'required'],
+            [['product_id', 'amount_type', 'size_id', 'created_at', 'updated_at'], 'integer']
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'Id',
+            'product_id' => 'Товар',
+            'amount_type' => 'Тип',
+            'size_id' => 'Размер',
+            'created_at' => 'Дата добавления',
+            'updated_at' => 'Дата изменения',
+        ];
+    }
+}

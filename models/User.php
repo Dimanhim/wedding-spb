@@ -15,6 +15,9 @@ use yii\helpers\Security;
  * @property string $username
  * @property string $email
  * @property string $name
+ * @property string $surname
+ * @property string $fathername
+ * @property string $employment_date
  * @property string $auth_key
  * @property string $password_hash
  * @property string $password_reset_token
@@ -47,11 +50,12 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['username', 'email', 'name', 'auth_key', 'password_hash', 'role', 'created_at', 'updated_at'], 'required', 'message' => 'Поле "{attribute}" обязательно для заполнения.'],
-            [['status', 'created_at', 'updated_at'], 'integer', 'message' => 'Поле "{attribute}" должно содержать целочисленное значение.'],
-            [['username', 'email', 'name', 'password_hash', 'password_reset_token', 'email_confirm_token', 'role'], 'string', 'max' => 255, 'message' => 'Поле "{attribute}" должно содержать не более 255 символов.'],
-            [['auth_key'], 'string', 'max' => 32, 'message' => 'Поле "{attribute}" должно содержать не более 32 символов.'],
-            [['username', 'email'], 'unique', 'message' => 'Поле "{attribute}" должно быть уникальным.']
+            [['username', 'email', 'name', 'surname', 'employment_date', 'auth_key', 'password_hash', 'role', 'created_at', 'updated_at'], 'required'],
+            [['status', 'created_at', 'updated_at'], 'integer'],
+            [['username', 'email', 'name', 'surname', 'fathername', 'employment_date', 'password_hash', 'password_reset_token', 'email_confirm_token', 'role'], 'string', 'max' => 255],
+            [['auth_key'], 'string', 'max' => 32],
+            [['email'], 'unique'],
+            [['username'], 'unique']
         ];
     }
 
@@ -61,21 +65,23 @@ class User extends ActiveRecord implements IdentityInterface
     public function attributeLabels()
     {
         return [
-            'id' => 'Id',
-            'username' => 'Логин',
+            'id' => 'ID',
+            'username' => 'Username',
             'email' => 'Email',
-            'name' => 'Имя',
+            'name' => 'Name',
+            'surname' => 'Surname',
+            'fathername' => 'Fathername',
+            'employment_date' => 'Employment Date',
             'auth_key' => 'Auth Key',
             'password_hash' => 'Password Hash',
             'password_reset_token' => 'Password Reset Token',
             'email_confirm_token' => 'Email Confirm Token',
-            'role' => 'Роль',
-            'status' => 'Статус',
-            'created_at' => 'Дата добавления',
-            'updated_at' => 'Дата обновления',
+            'role' => 'Role',
+            'status' => 'Status',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
         ];
     }
-
 
     /**
      * @inheritdoc
@@ -193,5 +199,4 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $this->password_reset_token = null;
     }
-
 }
