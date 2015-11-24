@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'summary' => '<div class="summary">Показаны <b>{begin}-{end}</b> из <b>{totalCount}</b> товаров</div>',
         'columns' => [
             'marka',
-            'artikul',
+            'model',
             'color',
             'description',
             // 'photo',

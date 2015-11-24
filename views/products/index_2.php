@@ -23,7 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             'id',
             'marka',
-            'artikul',
+            'model',
             'color',
             'description',
             // 'photo',

@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'id',
             'marka',
-            'artikul',
+            'model',
             'color',
             'description',
             'photo',
@@ -39,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'recommended_price_big',
             'price_small',
             'price_big',
-            'price_ratio',
+            'ratio',
             [
                 'attribute' => 'created_at',
                 'value' => date('d.m.Y H:i', $model->created_at),
