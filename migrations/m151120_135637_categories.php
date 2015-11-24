@@ -14,27 +14,28 @@ class m151120_135637_categories extends Migration
         $this->createTable('{{%categories}}', [
             'id'            => Schema::TYPE_PK,
             'name'          => Schema::TYPE_STRING . ' NOT NULL',
+            'type'          => Schema::TYPE_INTEGER . ' NOT NULL',
             'created_at'    => Schema::TYPE_INTEGER . ' NOT NULL',
             'updated_at'    => Schema::TYPE_INTEGER . ' NOT NULL',
         ], $tableOptions);
 
         $time = time();
-        $this->insert('{{%categories}}', ['name' => 'Свадебные платья', 'created_at' => $time, 'updated_at' => $time]);
-        $this->insert('{{%categories}}', ['name' => 'Вечерние платья', 'created_at' => $time, 'updated_at' => $time]);
-        $this->insert('{{%categories}}', ['name' => 'Фата', 'created_at' => $time, 'updated_at' => $time]);
-        $this->insert('{{%categories}}', ['name' => 'Болеро', 'created_at' => $time, 'updated_at' => $time]);
-        $this->insert('{{%categories}}', ['name' => 'Шубки-накидки', 'created_at' => $time, 'updated_at' => $time]);
-        $this->insert('{{%categories}}', ['name' => 'Обувь', 'created_at' => $time, 'updated_at' => $time]);
-        $this->insert('{{%categories}}', ['name' => 'Пояса', 'created_at' => $time, 'updated_at' => $time]);
-        $this->insert('{{%categories}}', ['name' => 'Украшение', 'created_at' => $time, 'updated_at' => $time]);
-        $this->insert('{{%categories}}', ['name' => 'Подвязки', 'created_at' => $time, 'updated_at' => $time]);
-        $this->insert('{{%categories}}', ['name' => 'Заколки', 'created_at' => $time, 'updated_at' => $time]);
-        $this->insert('{{%categories}}', ['name' => 'Перчатки', 'created_at' => $time, 'updated_at' => $time]);
-        $this->insert('{{%categories}}', ['name' => 'Чулки-колготки', 'created_at' => $time, 'updated_at' => $time]);
-        $this->insert('{{%categories}}', ['name' => 'Бокалы', 'created_at' => $time, 'updated_at' => $time]);
-        $this->insert('{{%categories}}', ['name' => 'Аксессуары для свадеб', 'created_at' => $time, 'updated_at' => $time]);
-        $this->insert('{{%categories}}', ['name' => 'Кринолины', 'created_at' => $time, 'updated_at' => $time]);
-        $this->insert('{{%categories}}', ['name' => 'Чехлы-сумки с логотипом', 'created_at' => $time, 'updated_at' => $time]);
+        $this->insert('{{%categories}}', ['name' => 'Свадебные платья', 'type' => 1, 'created_at' => $time, 'updated_at' => $time]);
+        $this->insert('{{%categories}}', ['name' => 'Вечерние платья', 'type' => 1, 'created_at' => $time, 'updated_at' => $time]);
+        $this->insert('{{%categories}}', ['name' => 'Фата', 'type' => 1, 'created_at' => $time, 'updated_at' => $time]);
+        $this->insert('{{%categories}}', ['name' => 'Болеро', 'type' => 1, 'created_at' => $time, 'updated_at' => $time]);
+        $this->insert('{{%categories}}', ['name' => 'Шубки-накидки', 'type' => 1, 'created_at' => $time, 'updated_at' => $time]);
+        $this->insert('{{%categories}}', ['name' => 'Обувь', 'type' => 1, 'created_at' => $time, 'updated_at' => $time]);
+        $this->insert('{{%categories}}', ['name' => 'Пояса', 'type' => 2, 'created_at' => $time, 'updated_at' => $time]);
+        $this->insert('{{%categories}}', ['name' => 'Украшение', 'type' => 2, 'created_at' => $time, 'updated_at' => $time]);
+        $this->insert('{{%categories}}', ['name' => 'Подвязки', 'type' => 2, 'created_at' => $time, 'updated_at' => $time]);
+        $this->insert('{{%categories}}', ['name' => 'Заколки', 'type' => 2, 'created_at' => $time, 'updated_at' => $time]);
+        $this->insert('{{%categories}}', ['name' => 'Перчатки', 'type' => 2, 'created_at' => $time, 'updated_at' => $time]);
+        $this->insert('{{%categories}}', ['name' => 'Чулки-колготки', 'type' => 3, 'created_at' => $time, 'updated_at' => $time]);
+        $this->insert('{{%categories}}', ['name' => 'Бокалы', 'type' => 4, 'created_at' => $time, 'updated_at' => $time]);
+        $this->insert('{{%categories}}', ['name' => 'Аксессуары для свадеб', 'type' => 4, 'created_at' => $time, 'updated_at' => $time]);
+        $this->insert('{{%categories}}', ['name' => 'Кринолины', 'type' => 5, 'created_at' => $time, 'updated_at' => $time]);
+        $this->insert('{{%categories}}', ['name' => 'Чехлы-сумки с логотипом', 'type' => 6, 'created_at' => $time, 'updated_at' => $time]);
 
     }
 

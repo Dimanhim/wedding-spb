@@ -4,23 +4,38 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
+/* @var $searchModel app\models\ProductSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Категории';
+$this->title = $category->name;
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="category-index">
+<div class="product-index">
     <h1><?= Html::encode($this->title) ?></h1>
+    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
     <p>
-        <?= Html::a('Добавить категорию', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Добавить товар', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
-        'summary' => '<div class="summary">Показаны <b>{begin}-{end}</b> из <b>{totalCount}</b> категорий</div>',
+        'filterModel' => $searchModel,
+        'summary' => '<div class="summary">Показаны <b>{begin}-{end}</b> из <b>{totalCount}</b> товаров</div>',
         'columns' => [
             'id',
-            'name',
-            'type',
+            'marka',
+            'artikul',
+            'color',
+            'description',
+            // 'photo',
+            // 'purchase_price_small',
+            // 'purchase_price_big',
+            // 'purchase_price_small_dol',
+            // 'purchase_price_big_dol',
+            // 'recommended_price_small',
+            // 'recommended_price_big',
+            // 'price_small',
+            // 'price_big',
+            // 'price_ratio',
             [
                 'attribute' => 'created_at',
                 'value'=> function($data) {
@@ -40,7 +55,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'class' => 'btn btn-danger btn-xs',
                             'title' => 'Удалить',
                             'data' => [
-                                'confirm' => 'Вы уверены, что хотите удалить категорию?',
+                                'confirm' => 'Вы уверены, что хотите удалить товар?',
                                 'method' => 'post',
                             ],
                         ]);

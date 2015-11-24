@@ -1,7 +1,14 @@
 <?php
 
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use kartik\form\ActiveForm;
+use kartik\builder\Form;
+use yii\helpers\ArrayHelper;
+use app\models\Mark;
+use app\models\Model;
+use app\models\Color;
+use app\models\Rate;
+use app\models\Size;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Product */
@@ -9,21 +16,109 @@ use yii\widgets\ActiveForm;
 ?>
 
 <div class="product-form">
-    <?php $form = ActiveForm::begin(); ?>
-    <?= $form->field($model, 'marka')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'artikul')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'color')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'description')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'photo')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'purchase_price_small')->textInput() ?>
-    <?= $form->field($model, 'purchase_price_big')->textInput() ?>
-    <?= $form->field($model, 'purchase_price_small_dol')->textInput() ?>
-    <?= $form->field($model, 'purchase_price_big_dol')->textInput() ?>
-    <?= $form->field($model, 'recommended_price_small')->textInput() ?>
-    <?= $form->field($model, 'recommended_price_big')->textInput() ?>
-    <?= $form->field($model, 'price_small')->textInput() ?>
-    <?= $form->field($model, 'price_big')->textInput() ?>
-    <?= $form->field($model, 'price_ratio')->textInput() ?>
+    <?php
+        $model->marka_or = 'Или';
+        $model->model_or = 'Или';
+        $model->color_or = 'Или';
+        $model->size_or  = 'Или';
+        $model->ratio_or = 'Или';
+        $form = ActiveForm::begin();
+        echo Form::widget([
+            'model' => $model,
+            'form' => $form,
+            'columns' => 12,
+            'attributes' => [
+                'marka' => [
+                    'type' => Form::INPUT_DROPDOWN_LIST, 
+                    'items'=> ArrayHelper::map(Mark::find()->orderBy('name')->asArray()->all(), 'id', 'name'),
+                    'columnOptions' => ['colspan' => 5],
+                    'options' => ['prompt' => 'Выберите марку'],
+                ],
+                'marka_or' => ['type'=>Form::INPUT_STATIC, 'label' => false, 'columnOptions' => ['colspan' => 2]],
+                'marka_new' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 5]],
+                'model' => [
+                    'type' => Form::INPUT_DROPDOWN_LIST, 
+                    'items'=> ArrayHelper::map(Model::find()->orderBy('name')->asArray()->all(), 'id', 'name'),
+                    'columnOptions' => ['colspan' => 5],
+                    'options' => ['prompt' => 'Выберите модель'],
+                ],
+                'model_or' => ['type'=>Form::INPUT_STATIC, 'label' => false, 'columnOptions' => ['colspan' => 2]],
+                'model_new' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 5]],
+                'color' => [
+                    'type' => Form::INPUT_DROPDOWN_LIST, 
+                    'items'=> ArrayHelper::map(Color::find()->orderBy('name')->asArray()->all(), 'id', 'name'),
+                    'columnOptions' => ['colspan' => 5],
+                    'options' => ['prompt' => 'Выберите цвет'],
+                ],
+                'color_or' => ['type'=>Form::INPUT_STATIC, 'label' => false, 'columnOptions' => ['colspan' => 2]],
+                'color_new' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 5]],
+                'size' => [
+                    'type' => Form::INPUT_MULTISELECT, 
+                    'items'=> ArrayHelper::map(Size::find()->orderBy('name')->asArray()->all(), 'id', 'name'),
+                    'columnOptions' => ['colspan' => 5],
+                    'options' => ['prompt' => 'Выберите размер(-ы)'],
+                ],
+                'size_or' => ['type'=>Form::INPUT_STATIC, 'label' => false, 'columnOptions' => ['colspan' => 2]],
+                'size_new' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 5]],
+                'ratio' => [
+                    'type' => Form::INPUT_DROPDOWN_LIST, 
+                    'items'=> ArrayHelper::map(Rate::find()->orderBy('name')->asArray()->all(), 'id', 'name'),
+                    'columnOptions' => ['colspan' => 5],
+                    'options' => ['prompt' => 'Выберите коэффициент'],
+                ],
+                'ratio_or' => ['type'=>Form::INPUT_STATIC, 'label' => false, 'columnOptions' => ['colspan' => 2]],
+                'ratio_new' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 5]],
+            ]
+        ]);
+        echo Form::widget([
+            'model' => $model,
+            'form' => $form,
+            'columns' => 2,
+            'attributes' => [
+                'purchase_price_small' => ['type'=>Form::INPUT_TEXT],
+                'purchase_price_big' => ['type'=>Form::INPUT_TEXT],
+                'purchase_price_small_dol' => ['type'=>Form::INPUT_TEXT],
+                'purchase_price_big_dol' => ['type'=>Form::INPUT_TEXT],
+                'price_small' => ['type'=>Form::INPUT_TEXT],
+                'price_big' => ['type'=>Form::INPUT_TEXT],
+            ]
+        ]);
+    ?>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-group field-amount-description">
+                <label class="control-label" for="amount-description">Фактическое наличие товара</label>
+                <table class="table table-bordered" id="amount_table">
+                    <tr>
+                        <th>Наличие</th>
+                    </tr>
+                    <tr>
+                        <td>Зал</td>
+                    </tr>
+                    <tr>
+                        <td>Склад</td>
+                    </tr>
+                    <tr>
+                        <td>Ждём</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <?php
+        echo Form::widget([
+            'model' => $model,
+            'form' => $form,
+            'columns' => 1,
+            'attributes' => [
+                'description' => ['type'=>Form::INPUT_TEXTAREA],
+                'photo' => ['type'=>Form::INPUT_FILE],
+            ]
+        ]);
+    ?>
+
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Добавить' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>

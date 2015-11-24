@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\Product;
 use app\models\ProductSearch;
+use app\models\Category;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -30,14 +31,16 @@ class ProductsController extends Controller
      * Lists all Product models.
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($category_id)
     {
+        $category = Category::findOne($category_id);
         $searchModel = new ProductSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
+        return $this->render('index_'.$category->type, [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'category' => $category,
         ]);
     }
 
@@ -58,15 +61,16 @@ class ProductsController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($category_id)
     {
         $model = new Product();
-
+        $category = Category::findOne($category_id);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
                 'model' => $model,
+                'category' => $category,
             ]);
         }
     }

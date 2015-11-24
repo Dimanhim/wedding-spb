@@ -38,7 +38,7 @@ class Amount extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['product_id', 'amount_type', 'created_at', 'updated_at'], 'required'],
+            [['product_id', 'amount_type'], 'required'],
             [['product_id', 'amount_type', 'size_id', 'created_at', 'updated_at'], 'integer']
         ];
     }

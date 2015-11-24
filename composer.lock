@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "479407875c975e7dbee0aefcb85e62d5",
-    "content-hash": "5c27dd23827e5c153817a7f3f5d227c6",
+    "hash": "32d29413097c16ce99c72fa3325d698e",
+    "content-hash": "6b9051d950299535315f56cc49b8de27",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -316,6 +316,280 @@
                 "html"
             ],
             "time": "2013-11-30 08:25:19"
+        },
+        {
+            "name": "kartik-v/mpdf",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kartik-v/mpdf.git",
+                "reference": "6ab0ae3a82673e514f168c8e6da02289e6d95f2c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kartik-v/mpdf/zipball/6ab0ae3a82673e514f168c8e6da02289e6d95f2c",
+                "reference": "6ab0ae3a82673e514f168c8e6da02289e6d95f2c",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "php": ">=4.3.10"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "mpdf.php",
+                    "classes"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-1.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Ian N Back"
+                }
+            ],
+            "description": "A PHP class to generate PDF files from HTML with Unicode/UTF-8 and CJK support. This is a fork of the official mPDF library.",
+            "homepage": "http://www.mpdf1.com/mpdf/index.php",
+            "keywords": [
+                "pdf",
+                "php",
+                "utf-8"
+            ],
+            "time": "2015-05-05 07:34:49"
+        },
+        {
+            "name": "kartik-v/yii2-builder",
+            "version": "v1.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kartik-v/yii2-builder.git",
+                "reference": "a9af9bdf9cc1f97ee6a262dbd801d0cdac97a8c8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kartik-v/yii2-builder/zipball/a9af9bdf9cc1f97ee6a262dbd801d0cdac97a8c8",
+                "reference": "a9af9bdf9cc1f97ee6a262dbd801d0cdac97a8c8",
+                "shasum": ""
+            },
+            "require": {
+                "kartik-v/yii2-grid": "*",
+                "kartik-v/yii2-krajee-base": "*",
+                "kartik-v/yii2-widget-activeform": "*"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "kartik\\builder\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD 3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Kartik Visweswaran",
+                    "email": "kartikv2@gmail.com",
+                    "homepage": "http://www.krajee.com/"
+                }
+            ],
+            "description": "Build forms (single-row or multi-row/tabular) easily for Yii Framework 2.0",
+            "homepage": "https://github.com/kartik-v/yii2-builder",
+            "keywords": [
+                "builder",
+                "extension",
+                "form",
+                "widget",
+                "yii2"
+            ],
+            "time": "2015-01-28 03:40:28"
+        },
+        {
+            "name": "kartik-v/yii2-grid",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kartik-v/yii2-grid.git",
+                "reference": "cbb3ce2fa20171fd5ae13525621f60ea2caebd20"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kartik-v/yii2-grid/zipball/cbb3ce2fa20171fd5ae13525621f60ea2caebd20",
+                "reference": "cbb3ce2fa20171fd5ae13525621f60ea2caebd20",
+                "shasum": ""
+            },
+            "require": {
+                "kartik-v/yii2-krajee-base": "~1.7"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "kartik\\grid\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Kartik Visweswaran",
+                    "email": "kartikv2@gmail.com",
+                    "homepage": "http://www.krajee.com/"
+                }
+            ],
+            "description": "Yii 2 GridView on steroids. Various enhancements and utilities for the Yii 2.0 GridView widget.",
+            "homepage": "https://github.com/kartik-v/yii2-grid",
+            "keywords": [
+                "extension",
+                "grid",
+                "widget",
+                "yii2"
+            ],
+            "time": "2015-11-02 10:51:01"
+        },
+        {
+            "name": "kartik-v/yii2-krajee-base",
+            "version": "v1.7.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kartik-v/yii2-krajee-base.git",
+                "reference": "f90b9ff515ced4e40ff5ec8156a5c9f7f51e2a7f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kartik-v/yii2-krajee-base/zipball/f90b9ff515ced4e40ff5ec8156a5c9f7f51e2a7f",
+                "reference": "f90b9ff515ced4e40ff5ec8156a5c9f7f51e2a7f",
+                "shasum": ""
+            },
+            "require": {
+                "yiisoft/yii2-bootstrap": "@dev"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "kartik\\base\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Kartik Visweswaran",
+                    "email": "kartikv2@gmail.com",
+                    "homepage": "http://www.krajee.com/"
+                }
+            ],
+            "description": "Base library and foundation components for all Yii2 Krajee extensions.",
+            "homepage": "https://github.com/kartik-v/yii2-krajee-base",
+            "keywords": [
+                "base",
+                "extension",
+                "foundation",
+                "krajee",
+                "widget",
+                "yii2"
+            ],
+            "time": "2015-11-22 06:35:23"
+        },
+        {
+            "name": "kartik-v/yii2-mpdf",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kartik-v/yii2-mpdf.git",
+                "reference": "4599a1d95d7e0afb3279322e302717b7e4f52dd3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kartik-v/yii2-mpdf/zipball/4599a1d95d7e0afb3279322e302717b7e4f52dd3",
+                "reference": "4599a1d95d7e0afb3279322e302717b7e4f52dd3",
+                "shasum": ""
+            },
+            "require": {
+                "kartik-v/mpdf": "*"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "kartik\\mpdf\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD 3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Kartik Visweswaran",
+                    "email": "kartikv2@gmail.com",
+                    "homepage": "http://www.krajee.com/"
+                }
+            ],
+            "description": "A Yii2 wrapper component for the mPDF library which generates PDF files from UTF-8 encoded HTML.",
+            "homepage": "https://github.com/kartik-v/yii2-mpdf",
+            "keywords": [
+                "component",
+                "extension",
+                "html",
+                "mpdf",
+                "pdf",
+                "utf8",
+                "yii2"
+            ],
+            "time": "2014-11-10 18:09:37"
+        },
+        {
+            "name": "kartik-v/yii2-widget-activeform",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kartik-v/yii2-widget-activeform.git",
+                "reference": "1ccb21990894bf99cac2ab58605055b40ed18a7b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kartik-v/yii2-widget-activeform/zipball/1ccb21990894bf99cac2ab58605055b40ed18a7b",
+                "reference": "1ccb21990894bf99cac2ab58605055b40ed18a7b",
+                "shasum": ""
+            },
+            "require": {
+                "kartik-v/yii2-krajee-base": "~1.7"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "kartik\\form\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Kartik Visweswaran",
+                    "email": "kartikv2@gmail.com",
+                    "homepage": "http://www.krajee.com/"
+                }
+            ],
+            "description": "Enhanced Yii2 active-form and active-field with full bootstrap styling support (sub repo split from yii2-widgets).",
+            "homepage": "https://github.com/kartik-v/yii2-widget-activeform",
+            "keywords": [
+                "activefield",
+                "activeform",
+                "extension",
+                "field",
+                "form",
+                "widget",
+                "yii2"
+            ],
+            "time": "2015-11-01 10:14:48"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -915,7 +1189,11 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "kartik-v/yii2-grid": 20,
+        "kartik-v/yii2-builder": 20,
+        "kartik-v/yii2-widget-activeform": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

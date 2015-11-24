@@ -38,7 +38,7 @@ class Rate extends \yii\db\ActiveRecord
     {
         return [
             [['category_id', 'created_at', 'updated_at'], 'integer'],
-            [['name', 'created_at', 'updated_at'], 'required'],
+            [['name'], 'required'],
             [['name'], 'string', 'max' => 255]
         ];
     }

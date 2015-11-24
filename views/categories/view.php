@@ -27,6 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'id',
             'name',
+            'type',
             [
                 'attribute' => 'created_at',
                 'value' => date('d.m.Y H:i', $model->created_at),

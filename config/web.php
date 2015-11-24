@@ -53,6 +53,11 @@ $config = [
             'currencyCode' => 'RUB',
         ],
     ],
+    'modules' => [
+        'gridview' =>  [
+            'class' => '\kartik\grid\Module'
+        ]
+    ],
     'params' => $params,
     'defaultRoute' => 'site/index',
 ];

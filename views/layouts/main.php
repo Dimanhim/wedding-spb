@@ -8,6 +8,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
+use app\models\Category;
 
 AppAsset::register($this);
 ?>
@@ -33,27 +34,18 @@ AppAsset::register($this);
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
+    $cat_items = [];
+    $categories = Category::find()->all();
+    foreach ($categories as $category) {
+        $cat_items[] = [
+            'label' => $category->name,
+            'url' => ['/products/index', 'category_id' => $category->id],
+        ];
+    }
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
-            ['label' => 'Товары', 'url' => ['/products/index'], 'items' => [
-                ['label' => 'Свадебные платья', 'url' => ['/site/about2']],
-                ['label' => 'Вечерние платья', 'url' => ['/site/about2']],
-                ['label' => 'Фата', 'url' => ['/site/about2']],
-                ['label' => 'Болеро', 'url' => ['/site/about2']],
-                ['label' => 'Шубки-накидки', 'url' => ['/site/about2']],
-                ['label' => 'Обувь', 'url' => ['/site/about2']],
-                ['label' => 'Пояса', 'url' => ['/site/about2']],
-                ['label' => 'Украшение', 'url' => ['/site/about2']],
-                ['label' => 'Подвязка', 'url' => ['/site/about2']],
-                ['label' => 'Заколки', 'url' => ['/site/about2']],
-                ['label' => 'Перчатки', 'url' => ['/site/about2']],
-                ['label' => 'Чулки-колготки', 'url' => ['/site/about2']],
-                ['label' => 'Бокалы', 'url' => ['/site/about2']],
-                ['label' => 'Аксессуары для свадеб', 'url' => ['/site/about2']],
-                ['label' => 'Кринолины', 'url' => ['/site/about2']],
-                ['label' => 'Чехол- сумка с логотипом', 'url' => ['/site/about2']],
-            ]],
+            ['label' => 'Товары', 'url' => ['/products/index'], 'items' => $cat_items],
             ['label' => 'Заказы', 'url' => ['/site/about']],
             ['label' => 'Перемещения', 'url' => ['/site/contact'], 'items' =>[
                 ['label' => 'Со склада в зал', 'url' => ['/site/about2']],
@@ -82,6 +74,10 @@ AppAsset::register($this);
 
     <div class="container">
         <?= Breadcrumbs::widget([
+            'homeLink' => [ 
+                'label' => 'Главная',
+                'url' => Yii::$app->homeUrl,
+            ],
             'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
         ]) ?>
         <?= $content ?>
