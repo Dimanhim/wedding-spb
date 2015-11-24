@@ -19,8 +19,8 @@ class ProductSearch extends Product
     {
         return [
             [['id', 'created_at', 'updated_at'], 'integer'],
-            [['marka', 'artikul', 'color', 'description', 'photo'], 'safe'],
-            [['purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'recommended_price_small', 'recommended_price_big', 'price_small', 'price_big', 'price_ratio'], 'number'],
+            [['marka', 'model', 'color', 'description', 'photo'], 'safe'],
+            [['purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'recommended_price_small', 'recommended_price_big', 'price_small', 'price_big', 'ratio'], 'number'],
         ];
     }
 
@@ -66,13 +66,13 @@ class ProductSearch extends Product
             'recommended_price_big' => $this->recommended_price_big,
             'price_small' => $this->price_small,
             'price_big' => $this->price_big,
-            'price_ratio' => $this->price_ratio,
+            'ratio' => $this->ratio,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
 
         $query->andFilterWhere(['like', 'marka', $this->marka])
-            ->andFilterWhere(['like', 'artikul', $this->artikul])
+            ->andFilterWhere(['like', 'model', $this->model])
             ->andFilterWhere(['like', 'color', $this->color])
             ->andFilterWhere(['like', 'description', $this->description])
             ->andFilterWhere(['like', 'photo', $this->photo]);
