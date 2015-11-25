@@ -10,9 +10,9 @@ use yii\behaviors\TimestampBehavior;
  *
  * @property integer $id
  * @property integer $category_id
- * @property string $marka
- * @property string $model
- * @property string $color
+ * @property string $marka_id
+ * @property string $model_id
+ * @property string $color_id
  * @property string $description
  * @property string $photo
  * @property double $purchase_price_small
@@ -23,25 +23,23 @@ use yii\behaviors\TimestampBehavior;
  * @property double $recommended_price_big
  * @property double $price_small
  * @property double $price_big
- * @property double $ratio
+ * @property double $ratio_id
  * @property integer $created_at
  * @property integer $updated_at
  */
 class Product extends \yii\db\ActiveRecord
 {
-    public $size;
+    public $sizes;
     public $amount;
 
     public $marka_new;
     public $model_new;
     public $color_new;
-    public $size_new;
     public $ratio_new;
     
     public $marka_or;
     public $model_or;
     public $color_or;
-    public $size_or;
     public $ratio_or;
 
     /**
@@ -59,17 +57,77 @@ class Product extends \yii\db\ActiveRecord
         ];
     }
 
+    public function scenarios()
+    {
+        return [
+            'type_1' => ['category_id', 'sizes', 'marka_id', 'marka_new', 'model_id', 'model_new', 'color_id', 'color_new', 'description', 'photo', 'purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new'],
+            'type_2' => ['category_id', 'marka_id', 'marka_new', 'model_id', 'model_new', 'color_id', 'color_new', 'description', 'photo', 'purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new'],
+            'type_3' => ['category_id', 'sizes', 'marka', 'marka_new', 'model_id', 'model_new', 'color_id', 'color_new', 'description', 'photo', 'purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new'],
+            'type_4' => ['category_id', 'marka_id', 'marka_new', 'model_id', 'model_new', 'description', 'photo', 'purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new'],
+            'type_5' => ['category_id', 'description', 'photo', 'purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new'],
+            'type_6' => ['category_id', 'marka_id', 'marka_new', 'description', 'photo', 'purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new'],
+        ];
+    }
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['category_id', 'purchase_price_small', 'purchase_price_big', 'recommended_price_small', 'recommended_price_big', 'price_small', 'price_big', 'ratio'], 'required'],
-            [['purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'recommended_price_small', 'recommended_price_big', 'price_small', 'price_big', 'ratio'], 'number'],
-            [['category_id', 'created_at', 'updated_at'], 'integer'],
-            [['marka', 'model', 'color', 'description', 'photo'], 'string', 'max' => 255]
+            [['category_id', 'purchase_price_small', 'purchase_price_big', 'price_small', 'price_big', 'sizes'], 'required'],
+            [['purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new'], 'number'],
+            [['category_id'], 'integer'],
+            [['marka_id', 'marka_new', 'model_id', 'model_new', 'color_id', 'color_new', 'description', 'photo'], 'string', 'max' => 255],
+            ['marka_id', 'required', 'when' => function($model) {
+                return empty($model->marka_new);
+            }, 'whenClient' => "function (attribute, value) {
+                return $('#product-marka_new').val() == '';
+            }"],
+            ['model_id', 'required', 'when' => function($model) {
+                return empty($model->model_new);
+            }, 'whenClient' => "function (attribute, value) {
+                return $('#product-model_new').val() == '';
+            }"],
+            ['color_id', 'required', 'when' => function($model) {
+                return empty($model->color_new);
+            }, 'whenClient' => "function (attribute, value) {
+                return $('#product-color_new').val() == '';
+            }"],
+            ['ratio_id', 'required', 'when' => function($model) {
+                return empty($model->ratio_new);
+            }, 'whenClient' => "function (attribute, value) {
+                return $('#product-ratio_new').val() == '';
+            }"],
         ];
+    }
+
+    /**
+    * Relations
+    */
+    public function getMarka()
+    {
+        return $this->hasOne(Mark::className(), ['id' => 'marka_id']);
+    }
+
+    public function getModel()
+    {
+        return $this->hasOne(Model::className(), ['id' => 'model_id']);
+    }
+
+    public function getColor()
+    {
+        return $this->hasOne(Color::className(), ['id' => 'color_id']);
+    }
+
+    public function getRatio()
+    {
+        return $this->hasOne(Rate::className(), ['id' => 'ratio_id']);
+    }
+
+    public function getAmount()
+    {
+        return $this->hasMany(Amount::className(), ['product_id' => 'id']);
     }
 
     /**
@@ -81,14 +139,13 @@ class Product extends \yii\db\ActiveRecord
             'id' => 'Id',
             'amount' => 'Фактическое наличие товара',
             'category_id' => 'Категория',
-            'marka' => 'Марка',
+            'marka_id' => 'Марка',
             'marka_new' => 'Новая марка',
-            'model' => 'Модель',
+            'model_id' => 'Модель',
             'model_new' => 'Новая модель',
-            'color' => 'Цвет',
+            'color_id' => 'Цвет',
             'color_new' => 'Новый цвет',
-            'size' => 'Размер',
-            'size_new' => 'Новый размер',
+            'sizes' => 'Размер',
             'description' => 'Описание',
             'photo' => 'Изображение',
             'purchase_price_small' => 'Закупка (<48)',

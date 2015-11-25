@@ -18,9 +18,9 @@ class ProductSearch extends Product
     public function rules()
     {
         return [
-            [['id', 'created_at', 'updated_at'], 'integer'],
-            [['marka', 'model', 'color', 'description', 'photo'], 'safe'],
-            [['purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'recommended_price_small', 'recommended_price_big', 'price_small', 'price_big', 'ratio'], 'number'],
+            [['id', 'marka_id', 'model_id', 'color_id', 'ratio_id', 'created_at', 'updated_at'], 'integer'],
+            [['description', 'photo'], 'safe'],
+            [['purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'recommended_price_small', 'recommended_price_big', 'price_small', 'price_big'], 'number'],
         ];
     }
 
@@ -58,6 +58,9 @@ class ProductSearch extends Product
 
         $query->andFilterWhere([
             'id' => $this->id,
+            'marka_id' => $this->marka_id,
+            'model_id' => $this->model_id,
+            'color_id' => $this->color_id,
             'purchase_price_small' => $this->purchase_price_small,
             'purchase_price_big' => $this->purchase_price_big,
             'purchase_price_small_dol' => $this->purchase_price_small_dol,
@@ -66,15 +69,12 @@ class ProductSearch extends Product
             'recommended_price_big' => $this->recommended_price_big,
             'price_small' => $this->price_small,
             'price_big' => $this->price_big,
-            'ratio' => $this->ratio,
+            'ratio_id' => $this->ratio_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
 
-        $query->andFilterWhere(['like', 'marka', $this->marka])
-            ->andFilterWhere(['like', 'model', $this->model])
-            ->andFilterWhere(['like', 'color', $this->color])
-            ->andFilterWhere(['like', 'description', $this->description])
+        $query->andFilterWhere(['like', 'description', $this->description])
             ->andFilterWhere(['like', 'photo', $this->photo]);
 
         return $dataProvider;

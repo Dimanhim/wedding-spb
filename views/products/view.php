@@ -26,9 +26,18 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'marka',
-            'model',
-            'color',
+            [
+                'attribute' => 'marka_id',
+                'value' => $model->marka->name,
+            ],
+            [
+                'attribute' => 'model_id',
+                'value' => $model->model->name,
+            ],
+            [
+                'attribute' => 'color_id',
+                'value' => $model->color->name,
+            ],
             'description',
             'photo',
             'purchase_price_small',
@@ -39,7 +48,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'recommended_price_big',
             'price_small',
             'price_big',
-            'ratio',
+            [
+                'attribute' => 'ratio_id',
+                'value' => $model->ratio->name,
+            ],
             [
                 'attribute' => 'created_at',
                 'value' => date('d.m.Y H:i', $model->created_at),

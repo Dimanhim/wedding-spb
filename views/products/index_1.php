@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use kartik\grid\GridView;
+use himiklab\thumbnail\EasyThumbnailImage;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\ProductSearch */
@@ -21,9 +22,25 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'summary' => '<div class="summary">Показаны <b>{begin}-{end}</b> из <b>{totalCount}</b> товаров</div>',
         'columns' => [
-            'marka',
-            'model',
-            'color',
+            [
+                'attribute' => 'photo',
+                'enableSorting' => false,
+                'format' => 'raw',
+                'value'=> function($data) {
+                    return EasyThumbnailImage::thumbnailImg(\Yii::$app->basePath.$data->photo, 150, 100);
+                },
+                'groupedRow'=>true,
+            ],
+            [
+                'attribute' => 'marka_id', 
+                'value'=> function ($model) { 
+                    return $model->marka->name;
+                },
+                'group' => true,
+                'subGroupOf' => 1,
+            ],
+            'model_id',
+            'color_id',
             'description',
             // 'photo',
             // 'purchase_price_small',

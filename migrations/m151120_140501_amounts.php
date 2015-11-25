@@ -15,6 +15,7 @@ class m151120_140501_amounts extends Migration
             'id'            => Schema::TYPE_PK,
             'product_id'    => Schema::TYPE_INTEGER . ' NOT NULL',
             'amount_type'   => Schema::TYPE_INTEGER . ' NOT NULL',
+            'amount'        => Schema::TYPE_INTEGER . ' NOT NULL',
             'size_id'       => Schema::TYPE_INTEGER,
             'created_at'    => Schema::TYPE_INTEGER . ' NOT NULL',
             'updated_at'    => Schema::TYPE_INTEGER . ' NOT NULL',

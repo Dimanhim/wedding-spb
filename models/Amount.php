@@ -38,8 +38,8 @@ class Amount extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['product_id', 'amount_type'], 'required'],
-            [['product_id', 'amount_type', 'size_id', 'created_at', 'updated_at'], 'integer']
+            [['product_id', 'amount_type', 'amount'], 'required'],
+            [['product_id', 'amount_type', 'amount', 'size_id', 'created_at', 'updated_at'], 'integer']
         ];
     }
 
@@ -52,6 +52,7 @@ class Amount extends \yii\db\ActiveRecord
             'id' => 'Id',
             'product_id' => 'Товар',
             'amount_type' => 'Тип',
+            'amount' => 'Количество',
             'size_id' => 'Размер',
             'created_at' => 'Дата добавления',
             'updated_at' => 'Дата изменения',
