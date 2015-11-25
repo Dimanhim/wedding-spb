@@ -79,4 +79,15 @@ class ProductSearch extends Product
 
         return $dataProvider;
     }
+
+    public function multi_array_search($array, $search)
+    {
+        foreach ($array as $key => $value) {
+            foreach ($search as $k => $v) {
+                if (!isset($value[$k]) || $value[$k] != $v) continue 2;
+            }
+            return $key;
+        }
+        return false;
+    }
 }

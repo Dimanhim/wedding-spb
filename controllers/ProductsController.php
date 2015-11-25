@@ -15,6 +15,7 @@ use app\models\Model;
 use app\models\Color;
 use app\models\Rate;
 use app\models\Amount;
+use app\models\Size;
 
 /**
  * ProductsController implements the CRUD actions for Product model.
@@ -47,6 +48,7 @@ class ProductsController extends Controller
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'category' => $category,
+            'sizes' => Size::find()->all(),
         ]);
     }
 

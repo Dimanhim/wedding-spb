@@ -17,67 +17,81 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         <?= Html::a('Добавить товар', ['create', 'category_id' => $category->id], ['class' => 'btn btn-success']) ?>
     </p>
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'summary' => '<div class="summary">Показаны <b>{begin}-{end}</b> из <b>{totalCount}</b> товаров</div>',
-        'columns' => [
-            [
-                'attribute' => 'photo',
-                'enableSorting' => false,
-                'format' => 'raw',
-                'value'=> function($data) {
-                    return EasyThumbnailImage::thumbnailImg(\Yii::$app->basePath.$data->photo, 150, 100);
-                },
-                'groupedRow'=>true,
-            ],
-            [
-                'attribute' => 'marka_id', 
-                'value'=> function ($model) { 
-                    return $model->marka->name;
-                },
-                'group' => true,
-                'subGroupOf' => 1,
-            ],
-            'model_id',
-            'color_id',
-            'description',
-            // 'photo',
-            // 'purchase_price_small',
-            // 'purchase_price_big',
-            // 'purchase_price_small_dol',
-            // 'purchase_price_big_dol',
-            // 'recommended_price_small',
-            // 'recommended_price_big',
-            // 'price_small',
-            // 'price_big',
-            // 'price_ratio',
-            [
-                'attribute' => 'created_at',
-                'value'=> function($data) {
-                    return date('d.m.Y H:i', $data->created_at);
-                }
-            ],
-            ['class' => 'yii\grid\ActionColumn',
-                'buttons' => [
-                    'view' => function ($url, $model, $key) {
-                        return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', $url, ['class' => 'btn btn-primary btn-xs', 'title' => 'Посмотреть']);
-                    },
-                    'update' => function ($url, $model, $key) {
-                        return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, ['class' => 'btn btn-info btn-xs', 'title' => 'Редактировать']);
-                    },
-                    'delete' => function ($url, $model, $key) {
-                        return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, [
-                            'class' => 'btn btn-danger btn-xs',
-                            'title' => 'Удалить',
-                            'data' => [
-                                'confirm' => 'Вы уверены, что хотите удалить товар?',
-                                'method' => 'post',
-                            ],
-                        ]);
-                    },
-                ],
-            ],
-        ],
-    ]); ?>
+
+    <table class="table">
+        <tr>
+            <th></th>
+            <th>марка</th>
+            <th>$</th>
+            <th>закупка</th>
+            <th>закупка $</th>
+            <th>реком.</th>
+            <th>продажа</th>
+            <?php foreach ($sizes as $size): ?>
+                <th><?= $size->name ?></th>
+            <?php endforeach ?>
+            <th>наличие</th>
+            <th>действия</th>
+        </tr>
+
+        <?php foreach ($dataProvider->getModels() as $product): ?>
+            <?php
+                $amounts = $product->amounts;
+            ?>
+            <tr>
+                <td rowspan="4">
+                    <?= EasyThumbnailImage::thumbnailImg(\Yii::$app->basePath.$product->photo,100,150,EasyThumbnailImage::THUMBNAIL_OUTBOUND) ?>
+                </td>
+                <td><?= $product->marka->name ?></td>
+                <td>&lt;48</td>
+                <td><?= $product->purchase_price_small ?></td>
+                <td><?= $product->purchase_price_small_dol ?></td>
+                <td><?= $product->recommended_price_small ?></td>
+                <td><?= $product->price_small ?></td>
+                <?php foreach ($sizes as $size): ?>
+                    <?php $amount_key = $searchModel::multi_array_search($amounts, ['size_id' => $size->id, 'amount_type' => 1]); ?>
+                    <td><?= ($amount_key === false) ? 0 : $amounts[$amount_key]['amount'] ?></td>
+                <?php endforeach ?>
+                <td>зал</td>
+                <td>копировать</td>
+            </tr>
+            <tr>
+                <td><?= $product->model->name ?></td>
+                <td>&gt;50</td>
+                <td><?= $product->purchase_price_big ?></td>
+                <td><?= $product->purchase_price_big_dol ?></td>
+                <td><?= $product->recommended_price_big ?></td>
+                <td><?= $product->price_big ?></td>
+                <?php foreach ($sizes as $size): ?>
+                    <?php $amount_key = $searchModel::multi_array_search($amounts, ['size_id' => $size->id, 'amount_type' => 2]); ?>
+                    <td><?= ($amount_key === false) ? 0 : $amounts[$amount_key]['amount'] ?></td>
+                <?php endforeach ?>
+                <td>склад</td>
+                <td>удалить</td>
+            </tr>
+            <tr>
+                <td><?= $product->color->name ?></td>
+                <td></td>
+                <td>12.06.15</td>
+                <td></td>
+                <td>2,0</td>
+                <td>22.06.15</td>
+                <?php foreach ($sizes as $size): ?>
+                    <?php $amount_key = $searchModel::multi_array_search($amounts, ['size_id' => $size->id, 'amount_type' => 3]); ?>
+                    <td><?= ($amount_key === false) ? 0 : $amounts[$amount_key]['amount'] ?></td>
+                <?php endforeach ?>
+                <td>ждем</td>
+                <td>редактировать</td>
+            </tr>
+            <tr class="active">
+                <td colspan="6">заказ</td>
+                <?php foreach ($sizes as $size): ?>
+                    <td><input type="text" style="width: 30px;"></td>
+                <?php endforeach ?>
+                <td>2</td>
+                <td></td>
+            </tr>
+        <?php endforeach ?>
+        
+    </table>
 </div>

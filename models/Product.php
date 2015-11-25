@@ -125,9 +125,9 @@ class Product extends \yii\db\ActiveRecord
         return $this->hasOne(Rate::className(), ['id' => 'ratio_id']);
     }
 
-    public function getAmount()
+    public function getAmounts()
     {
-        return $this->hasMany(Amount::className(), ['product_id' => 'id']);
+        return $this->hasMany(Amount::className(), ['product_id' => 'id'])->asArray();
     }
 
     /**
