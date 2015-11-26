@@ -168,7 +168,7 @@ class Product extends \yii\db\ActiveRecord
             'recommended_price_big' => 'Рекомендованная цена (>50)',
             'price_small' => 'Цена (<48)',
             'price_big' => 'Цена (>50)',
-            'ratio' => 'Коэффициент',
+            'ratio_id' => 'Коэффициент',
             'ratio_new' => 'Новый коэффициент',
             'created_at' => 'Дата добавления',
             'updated_at' => 'Дата изменения',

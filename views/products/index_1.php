@@ -14,9 +14,9 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="product-index">
     <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
     <p>
         <?= Html::a('Добавить товар', ['create', 'category_id' => $category->id], ['class' => 'btn btn-success']) ?>
+        <?php echo $this->render('_search', ['model' => $searchModel, 'category_id' => $category->id]); ?>
     </p>
 
     <table class="table">
@@ -100,12 +100,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     'data-confirm' => 'Вы уверены, что хотите удалить товар?',
                 ]) ?></td>
             </tr>
-            <tr class="active">
-                <td colspan="6">заказ</td>
+            <tr class="active order_tr">
+                <th colspan="6" style="text-align: right; padding-top: 11px;">заказ</th>
                 <?php foreach ($sizes as $size): ?>
-                    <td><input type="text" style="width: 30px;"></td>
+                    <td><input type="number" style="width: 40px;" min="0" max="99" value="0"></td>
                 <?php endforeach ?>
-                <td>2</td>
+                <th class="total_item_amount">0</th>
                 <td></td>
             </tr>
         <?php endforeach ?>

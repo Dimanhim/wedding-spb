@@ -1,5 +1,6 @@
 $(function() {
 	
+	// Добавление и редактирование товаров
 	var product_create_form = $('.product-form form');
 	if (product_create_form.length) {
 
@@ -24,6 +25,23 @@ $(function() {
 			} else {
 				new_input.removeAttr('disabled');
 			}
+		});
+	}
+
+	// Список товаров
+	var product_table = $('.product-index table.table');
+	if (product_table.length) {
+
+		product_table.find('tr.order_tr input').change(function() {
+			var item = $(this),
+				tr = item.closest('tr'),
+				inputs = tr.find('input'),
+				total_amount = 0,
+				total_amount_holder = tr.find('th.total_item_amount');
+			$.each(inputs, function() {
+				total_amount += parseInt($(this).val());
+			});
+			total_amount_holder.text(total_amount);
 		});
 	}
 
