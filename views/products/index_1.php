@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use kartik\grid\GridView;
 use himiklab\thumbnail\EasyThumbnailImage;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\ProductSearch */
@@ -49,11 +50,15 @@ $this->params['breadcrumbs'][] = $this->title;
                 <td><?= $product->recommended_price_small ?></td>
                 <td><?= $product->price_small ?></td>
                 <?php foreach ($sizes as $size): ?>
-                    <?php $amount_key = $searchModel::multi_array_search($amounts, ['size_id' => $size->id, 'amount_type' => 1]); ?>
-                    <td><?= ($amount_key === false) ? 0 : $amounts[$amount_key]['amount'] ?></td>
+                    <td>
+                        <?php
+                            $amount_size = $product->getAmounts()->where(['size_id' => $size->id, 'amount_type' => 0])->one();
+                            echo $amount_size ? $amount_size->amount : 0;
+                        ?>
+                    </td>
                 <?php endforeach ?>
                 <td>зал</td>
-                <td>копировать</td>
+                <td><?= Html::a('Копировать', Url::toRoute(['products/copy', 'id' => $product->id]), ['class' => 'btn btn-success btn-xs btn-block', 'title' => 'Копировать']) ?></td>
             </tr>
             <tr>
                 <td><?= $product->model->name ?></td>
@@ -63,11 +68,15 @@ $this->params['breadcrumbs'][] = $this->title;
                 <td><?= $product->recommended_price_big ?></td>
                 <td><?= $product->price_big ?></td>
                 <?php foreach ($sizes as $size): ?>
-                    <?php $amount_key = $searchModel::multi_array_search($amounts, ['size_id' => $size->id, 'amount_type' => 2]); ?>
-                    <td><?= ($amount_key === false) ? 0 : $amounts[$amount_key]['amount'] ?></td>
+                    <td>
+                        <?php
+                            $amount_size = $product->getAmounts()->where(['size_id' => $size->id, 'amount_type' => 1])->one();
+                            echo $amount_size ? $amount_size->amount : 0;
+                        ?>
+                    </td>
                 <?php endforeach ?>
                 <td>склад</td>
-                <td>удалить</td>
+                <td><?= Html::a('Редактировать', Url::toRoute(['products/update', 'id' => $product->id]), ['class' => 'btn btn-primary btn-xs btn-block', 'title' => 'Редактировать']) ?></td>
             </tr>
             <tr>
                 <td><?= $product->color->name ?></td>
@@ -77,11 +86,19 @@ $this->params['breadcrumbs'][] = $this->title;
                 <td>2,0</td>
                 <td>22.06.15</td>
                 <?php foreach ($sizes as $size): ?>
-                    <?php $amount_key = $searchModel::multi_array_search($amounts, ['size_id' => $size->id, 'amount_type' => 3]); ?>
-                    <td><?= ($amount_key === false) ? 0 : $amounts[$amount_key]['amount'] ?></td>
+                    <td>
+                        <?php
+                            $amount_size = $product->getAmounts()->where(['size_id' => $size->id, 'amount_type' => 2])->one();
+                            echo $amount_size ? $amount_size->amount : 0;
+                        ?>
+                    </td>
                 <?php endforeach ?>
                 <td>ждем</td>
-                <td>редактировать</td>
+                <td><?= Html::a('Удалить', Url::toRoute(['products/delete', 'id' => $product->id]), [
+                    'class' => 'btn btn-danger btn-xs btn-block',
+                    'title' => 'Удалить',
+                    'data-confirm' => 'Вы уверены, что хотите удалить товар?',
+                ]) ?></td>
             </tr>
             <tr class="active">
                 <td colspan="6">заказ</td>

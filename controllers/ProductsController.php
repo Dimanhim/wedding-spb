@@ -25,12 +25,7 @@ class ProductsController extends Controller
     public function behaviors()
     {
         return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['post'],
-                ],
-            ],
+
         ];
     }
 
@@ -115,29 +110,28 @@ class ProductsController extends Controller
             $model->recommended_price_big = $model->purchase_price_big * $curr_rate;
 
             //Загрузка фото
-            $model->photo = UploadedFile::getInstance($model, 'photo');
-            if ($model->photo) {
-                $image_path = '/web/files/'.time().'.'. $model->photo->extension;
-                Yii::info(\Yii::$app->basePath.$image_path);
-                $model->photo->saveAs(\Yii::$app->basePath.$image_path);
+            $model->photo_file = UploadedFile::getInstance($model, 'photo');
+            if ($model->photo_file) {
+                $image_path = '/web/files/'.time().'.'. $model->photo_file->extension;
+                $model->photo_file->saveAs(\Yii::$app->basePath.$image_path);
                 $model->photo = $image_path;
             }
 
             if ($model->save()) {
                 //Сохранение кол-ва
-                foreach ($post['Product']['amount'] as $size_id => $size_vals) {
-                    foreach ($size_vals as $key => $value) {
-                        $new_amount = new Amount();
-                        $new_amount->product_id = $model->id;
-                        $new_amount->size_id = $size_id;
-                        $new_amount->amount_type = $key;
-                        $new_amount->amount = $value;
-                        $new_amount->save();
+                if (isset($post['Product']['amount'])) {
+                    foreach ($post['Product']['amount'] as $size_id => $size_vals) {
+                        foreach ($size_vals as $key => $value) {
+                            $new_amount = new Amount();
+                            $new_amount->product_id = $model->id;
+                            $new_amount->size_id = $size_id;
+                            $new_amount->amount_type = $key;
+                            $new_amount->amount = $value;
+                            $new_amount->save();
+                        }
                     }
                 }
-                return $this->redirect(['view', 'id' => $model->id]);
-            } else {
-                Yii::info(print_r($model->getErrors(), true));
+                return $this->redirect(['index', 'category_id' => $model->category->id]);
             }
         } else {
             return $this->render('create', [
@@ -145,6 +139,36 @@ class ProductsController extends Controller
                 'category' => $category,
             ]);
         }
+    }
+
+    public function actionCopy($id)
+    {
+        $model = $this->findModel($id);
+        $clone = new Product();
+        $clone->scenario = 'type_'.$model->category->type;
+        $clone->attributes = $model->attributes;
+
+        //Дублирование фото
+        if ($model->photo) {
+            $new_filename = '/web/files/'.time().'.'. pathinfo($model->photo, PATHINFO_EXTENSION);
+            if (copy(\Yii::$app->basePath.$model->photo, \Yii::$app->basePath.$new_filename)) {
+                $clone->photo = $new_filename;
+            }
+        }
+
+        if ($clone->save()) {
+            //Сохранение кол-ва
+            foreach (Amount::find()->where(['product_id' => $id])->all() as $amount_obj) {
+                $new_amount = new Amount();
+                $new_amount->attributes = $amount_obj->attributes;
+                $new_amount->product_id = $clone->id;
+                $new_amount->save();
+            }
+        } else {
+            Yii::info(print_r($clone->getErrors(), true));
+        }
+
+        return $this->redirect(['index', 'category_id' => $model->category->id]);
     }
 
     /**
@@ -156,12 +180,80 @@ class ProductsController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $model->scenario = 'type_'.$model->category->type;
+        $old_photo = $model->photo;
+        $post = Yii::$app->request->post();
+        if ($model->load($post)) {
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            //Добавление новых позиций в справочники
+            if ($model->marka_new) {
+                $new_mark = new Mark();
+                $new_mark->name = $model->marka_new;
+                if ($new_mark->save()) {
+                    $model->marka_id = $new_mark->id;
+                }
+            }
+            if ($model->model_new) {
+                $new_model = new Model();
+                $new_model->name = $model->model_new;
+                if ($new_model->save()) {
+                    $model->model_id = $new_model->id;
+                }
+            }
+            if ($model->color_new) {
+                $new_color = new Color();
+                $new_color->name = $model->color_new;
+                if ($new_color->save()) {
+                    $model->color_id = $new_color->id;
+                }
+            }
+            if ($model->ratio_new) {
+                $new_ratio = new Rate();
+                $new_ratio->name = $model->ratio_new;
+                if ($new_ratio->save()) {
+                    $model->ratio_id = $new_ratio->id;
+                }
+            }
+
+            //Расчет рекомендуемых цен
+            $curr_rate = Rate::findOne($model->ratio_id)->name;
+            $model->recommended_price_small = $model->purchase_price_small * $curr_rate;
+            $model->recommended_price_big = $model->purchase_price_big * $curr_rate;
+
+            //Загрузка фото
+            $model->photo_file = UploadedFile::getInstance($model, 'photo');
+            if ($model->photo_file) {
+                $image_path = '/web/files/'.time().'.'. $model->photo_file->extension;
+                $model->photo_file->saveAs(\Yii::$app->basePath.$image_path);
+                $model->photo = $image_path;
+                //Удаление старого фото
+                if ($old_photo) unlink(\Yii::$app->basePath.$old_photo);
+            } else {
+                $model->photo = $old_photo;
+            }
+
+            if ($model->save()) {
+                //Удаление старого кол-ва
+                Amount::deleteAll(['product_id' => $id]);
+                //Сохранение кол-ва
+                if (isset($post['Product']['amount'])) {
+                    foreach ($post['Product']['amount'] as $size_id => $size_vals) {
+                        foreach ($size_vals as $key => $value) {
+                            $new_amount = new Amount();
+                            $new_amount->product_id = $model->id;
+                            $new_amount->size_id = $size_id;
+                            $new_amount->amount_type = $key;
+                            $new_amount->amount = $value;
+                            $new_amount->save();
+                        }
+                    }
+                }
+                return $this->redirect(['index', 'category_id' => $model->category->id]);
+            }
         } else {
             return $this->render('update', [
                 'model' => $model,
+                'category' => $model->category,
             ]);
         }
     }
@@ -174,9 +266,15 @@ class ProductsController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        $old_photo = $model->photo;
+        $model->delete();
+        //Удаление кол-ва
+        Amount::deleteAll(['product_id' => $id]);
+        //Удаление старого фото
+        if ($old_photo) unlink(\Yii::$app->basePath.$old_photo);
 
-        return $this->redirect(['index']);
+        return $this->redirect(['index', 'category_id' => $model->category->id]);
     }
 
     /**

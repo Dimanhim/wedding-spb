@@ -29,6 +29,7 @@ use yii\behaviors\TimestampBehavior;
  */
 class Product extends \yii\db\ActiveRecord
 {
+    public $photo_file;
     public $sizes;
     public $amount;
 
@@ -60,12 +61,12 @@ class Product extends \yii\db\ActiveRecord
     public function scenarios()
     {
         return [
-            'type_1' => ['category_id', 'sizes', 'marka_id', 'marka_new', 'model_id', 'model_new', 'color_id', 'color_new', 'description', 'photo', 'purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new'],
-            'type_2' => ['category_id', 'marka_id', 'marka_new', 'model_id', 'model_new', 'color_id', 'color_new', 'description', 'photo', 'purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new'],
-            'type_3' => ['category_id', 'sizes', 'marka', 'marka_new', 'model_id', 'model_new', 'color_id', 'color_new', 'description', 'photo', 'purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new'],
-            'type_4' => ['category_id', 'marka_id', 'marka_new', 'model_id', 'model_new', 'description', 'photo', 'purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new'],
-            'type_5' => ['category_id', 'description', 'photo', 'purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new'],
-            'type_6' => ['category_id', 'marka_id', 'marka_new', 'description', 'photo', 'purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new'],
+            'type_1' => ['category_id', 'photo_file', 'sizes', 'marka_id', 'marka_new', 'model_id', 'model_new', 'color_id', 'color_new', 'description', 'photo', 'purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new', 'recommended_price_small', 'recommended_price_big'],
+            'type_2' => ['category_id', 'photo_file', 'marka_id', 'marka_new', 'model_id', 'model_new', 'color_id', 'color_new', 'description', 'photo', 'purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new', 'recommended_price_small', 'recommended_price_big'],
+            'type_3' => ['category_id', 'photo_file', 'sizes', 'marka', 'marka_new', 'model_id', 'model_new', 'color_id', 'color_new', 'description', 'photo', 'purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new', 'recommended_price_small', 'recommended_price_big'],
+            'type_4' => ['category_id', 'photo_file', 'marka_id', 'marka_new', 'model_id', 'model_new', 'description', 'photo', 'purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new', 'recommended_price_small', 'recommended_price_big'],
+            'type_5' => ['category_id', 'photo_file', 'description', 'photo', 'purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new', 'recommended_price_small', 'recommended_price_big'],
+            'type_6' => ['category_id', 'photo_file', 'marka_id', 'marka_new', 'description', 'photo', 'purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new', 'recommended_price_small', 'recommended_price_big'],
         ];
     }
 
@@ -75,10 +76,11 @@ class Product extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['category_id', 'purchase_price_small', 'purchase_price_big', 'price_small', 'price_big', 'sizes'], 'required'],
+            [['category_id', 'purchase_price_small', 'purchase_price_big', 'price_small', 'price_big'], 'required'],
             [['purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'price_small', 'price_big', 'ratio_id', 'ratio_new'], 'number'],
-            [['category_id'], 'integer'],
-            [['marka_id', 'marka_new', 'model_id', 'model_new', 'color_id', 'color_new', 'description', 'photo'], 'string', 'max' => 255],
+            [['category_id', 'marka_id', 'color_id', 'model_id'], 'integer'],
+            [['recommended_price_small', 'recommended_price_big', 'sizes', 'photo_file'], 'safe'],
+            [['marka_new', 'model_new', 'color_new', 'description', 'photo'], 'string', 'max' => 255],
             ['marka_id', 'required', 'when' => function($model) {
                 return empty($model->marka_new);
             }, 'whenClient' => "function (attribute, value) {
@@ -105,6 +107,11 @@ class Product extends \yii\db\ActiveRecord
     /**
     * Relations
     */
+    public function getCategory()
+    {
+        return $this->hasOne(Category::className(), ['id' => 'category_id']);
+    }
+
     public function getMarka()
     {
         return $this->hasOne(Mark::className(), ['id' => 'marka_id']);
@@ -125,9 +132,14 @@ class Product extends \yii\db\ActiveRecord
         return $this->hasOne(Rate::className(), ['id' => 'ratio_id']);
     }
 
+    // public function getAmountsArr()
+    // {
+    //     return $this->hasMany(Amount::className(), ['product_id' => 'id'])->asArray();
+    // }
+
     public function getAmounts()
     {
-        return $this->hasMany(Amount::className(), ['product_id' => 'id'])->asArray();
+        return $this->hasMany(Amount::className(), ['product_id' => 'id']);
     }
 
     /**

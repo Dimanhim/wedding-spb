@@ -44,6 +44,19 @@ class Amount extends \yii\db\ActiveRecord
     }
 
     /**
+    * Relations
+    */
+    public function getProduct()
+    {
+        return $this->hasOne(Product::className(), ['id' => 'product_id']);
+    }
+
+    public function getSize()
+    {
+        return $this->hasOne(Size::className(), ['id' => 'size_id']);
+    }
+
+    /**
      * @inheritdoc
      */
     public function attributeLabels()

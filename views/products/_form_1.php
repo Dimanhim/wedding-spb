@@ -9,6 +9,7 @@ use app\models\Model;
 use app\models\Color;
 use app\models\Rate;
 use app\models\Size;
+use himiklab\thumbnail\EasyThumbnailImage;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Product */
@@ -21,6 +22,13 @@ use app\models\Size;
         $model->model_or = 'Или';
         $model->color_or = 'Или';
         $model->ratio_or = 'Или';
+
+        $sizes = [];
+        foreach ($model->amounts as $amount) {
+            $sizes[$amount->size_id] = $amount->size->name;
+        }
+        $model->sizes = array_keys($sizes);
+
         $form = ActiveForm::begin(['options' => ['enctype'=>'multipart/form-data']]);
         echo $form->errorSummary($model);
         echo Form::widget([
@@ -35,7 +43,7 @@ use app\models\Size;
                     'options' => ['prompt' => 'Выберите марку'],
                 ],
                 'marka_or' => ['type'=>Form::INPUT_STATIC, 'label' => false, 'columnOptions' => ['colspan' => 2]],
-                'marka_new' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 5]],
+                'marka_new' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 5], 'options' => ['disabled' => $model->marka_id]],
             ]
         ]);
         echo Form::widget([
@@ -50,7 +58,7 @@ use app\models\Size;
                     'options' => ['prompt' => 'Выберите модель'],
                 ],
                 'model_or' => ['type'=>Form::INPUT_STATIC, 'label' => false, 'columnOptions' => ['colspan' => 2]],
-                'model_new' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 5]],
+                'model_new' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 5], 'options' => ['disabled' => $model->model_id]],
             ]
         ]);
         echo Form::widget([
@@ -65,7 +73,7 @@ use app\models\Size;
                     'options' => ['prompt' => 'Выберите цвет'],
                 ],
                 'color_or' => ['type'=>Form::INPUT_STATIC, 'label' => false, 'columnOptions' => ['colspan' => 2]],
-                'color_new' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 5]],
+                'color_new' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 5], 'options' => ['disabled' => $model->color_id]],
             ]
         ]);
         echo Form::widget([
@@ -80,7 +88,7 @@ use app\models\Size;
                     'options' => ['prompt' => 'Выберите коэффициент'],
                 ],
                 'ratio_or' => ['type'=>Form::INPUT_STATIC, 'label' => false, 'columnOptions' => ['colspan' => 2]],
-                'ratio_new' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 5]],
+                'ratio_new' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 5], 'options' => ['disabled' => $model->ratio_id]],
             ]
         ]);
         echo Form::widget([
@@ -90,7 +98,7 @@ use app\models\Size;
             'attributes' => [
                 'sizes' => [
                     'type' => Form::INPUT_MULTISELECT, 
-                    'items'=> ArrayHelper::map(Size::find()->orderBy('name')->asArray()->all(), 'id', 'name'),
+                    'items' => ArrayHelper::map(Size::find()->orderBy('name')->asArray()->all(), 'id', 'name'),
                     'columnOptions' => ['colspan' => 5],
                     'options' => ['prompt' => 'Выберите размер(-ы)'],
                 ],
@@ -116,18 +124,54 @@ use app\models\Size;
             <div class="form-group field-amount-description">
                 <label class="control-label" for="amount-description">Фактическое наличие товара</label>
                 <table class="table table-bordered" id="amount_table">
-                    <tr>
-                        <th>Наличие</th>
-                    </tr>
-                    <tr>
-                        <td>Зал</td>
-                    </tr>
-                    <tr>
-                        <td>Склад</td>
-                    </tr>
-                    <tr>
-                        <td>Ждём</td>
-                    </tr>
+                    <?php if (count($sizes)): ?>
+                        <tr>
+                            <?php foreach ($sizes as $key => $size): ?>
+                                <th><?= $size ?></th>
+                            <?php endforeach ?>
+                            <th>Наличие</th>
+                        </tr>
+                        <tr>
+                            <?php foreach ($sizes as $key => $size): ?>
+                                <td>
+                                    <?php $size_amount1 = $model->getAmounts()->where(['size_id' => $key, 'amount_type' => 0])->one()->amount ?>
+                                    <input type="number" class="form-control" value="<?= $size_amount1 ?>" name="Product[amount][<?= $key ?>][]">
+                                </td>
+                            <?php endforeach ?>
+                            <td>Зал</td>
+                        </tr>
+                        <tr>
+                            <?php foreach ($sizes as $key => $size): ?>
+                                <td>
+                                    <?php $size_amount2 = $model->getAmounts()->where(['size_id' => $key, 'amount_type' => 1])->one()->amount ?>
+                                    <input type="number" class="form-control" value="<?= $size_amount2 ?>" name="Product[amount][<?= $key ?>][]">
+                                </td>
+                            <?php endforeach ?>
+                            <td>Склад</td>
+                        </tr>
+                        <tr>
+                            <?php foreach ($sizes as $key => $size): ?>
+                                <td>
+                                    <?php $size_amount3 = $model->getAmounts()->where(['size_id' => $key, 'amount_type' => 2])->one()->amount ?>
+                                    <input type="number" class="form-control" value="<?= $size_amount3 ?>" name="Product[amount][<?= $key ?>][]">
+                                </td>
+                            <?php endforeach ?>
+                            <td>Ждём</td>
+                        </tr>
+                    <?php else: ?>
+                        <tr>
+                            <th>Наличие</th>
+                        </tr>
+                        <tr>
+                            <td>Зал</td>
+                        </tr>
+                        <tr>
+                            <td>Склад</td>
+                        </tr>
+                        <tr>
+                            <td>Ждём</td>
+                        </tr>
+                    <?php endif ?>
                 </table>
             </div>
         </div>
@@ -144,6 +188,12 @@ use app\models\Size;
             ]
         ]);
     ?>
+
+    <?php if ($model->photo): ?>
+        <div class="old_img" style="margin-bottom: 20px;">
+            <?= EasyThumbnailImage::thumbnailImg(\Yii::$app->basePath.$model->photo,100,150,EasyThumbnailImage::THUMBNAIL_OUTBOUND) ?>
+        </div>
+    <?php endif ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Добавить' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

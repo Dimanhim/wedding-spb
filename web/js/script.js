@@ -1,10 +1,11 @@
 $(function() {
 	
-	var product_create_form = $('.product-create form');
+	var product_create_form = $('.product-form form');
 	if (product_create_form.length) {
 
 		var amount_table = $('#amount_table'),
 			amount_table_default = amount_table.html();
+
 		$('#product-sizes').change(function() {
 			amount_table.html(amount_table_default);
 			var checked_sizes = $('input[name="Product\\[sizes\\]\\[\\]"]:checked');
