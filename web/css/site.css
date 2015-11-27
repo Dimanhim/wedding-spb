@@ -94,3 +94,19 @@ a.desc:after {
     text-align: center;
     padding-top: 32px;
 }
+
+.product-search > a{
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+.product-index h1{
+    margin-bottom: 20px;
+}
+
+#minicart{
+    width: 300px;
+    position: fixed;
+    top: 69px;
+    right: 0;
+    display: none;
+}
