@@ -9,6 +9,7 @@ use app\models\Model;
 use app\models\Color;
 use app\models\Rate;
 use app\models\Size;
+use himiklab\thumbnail\EasyThumbnailImage;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Product */
@@ -20,59 +21,23 @@ use app\models\Size;
         $model->marka_or = 'Или';
         $model->model_or = 'Или';
         $model->color_or = 'Или';
-        $model->size_or  = 'Или';
         $model->ratio_or = 'Или';
-        $form = ActiveForm::begin();
+
+        $form = ActiveForm::begin(['options' => ['enctype'=>'multipart/form-data']]);
+        echo $form->errorSummary($model);
         echo Form::widget([
             'model' => $model,
             'form' => $form,
             'columns' => 12,
             'attributes' => [
-                'marka' => [
-                    'type' => Form::INPUT_DROPDOWN_LIST, 
-                    'items'=> ArrayHelper::map(Mark::find()->orderBy('name')->asArray()->all(), 'id', 'name'),
-                    'columnOptions' => ['colspan' => 5],
-                    'options' => ['prompt' => 'Выберите марку'],
-                ],
-                'marka_or' => ['type'=>Form::INPUT_STATIC, 'label' => false, 'columnOptions' => ['colspan' => 2]],
-                'marka_new' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 5]],
-                'model' => [
-                    'type' => Form::INPUT_DROPDOWN_LIST, 
-                    'items'=> ArrayHelper::map(Model::find()->orderBy('name')->asArray()->all(), 'id', 'name'),
-                    'columnOptions' => ['colspan' => 5],
-                    'options' => ['prompt' => 'Выберите модель'],
-                ],
-                'model_or' => ['type'=>Form::INPUT_STATIC, 'label' => false, 'columnOptions' => ['colspan' => 2]],
-                'model_new' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 5]],
-                'color' => [
-                    'type' => Form::INPUT_DROPDOWN_LIST, 
-                    'items'=> ArrayHelper::map(Color::find()->orderBy('name')->asArray()->all(), 'id', 'name'),
-                    'columnOptions' => ['colspan' => 5],
-                    'options' => ['prompt' => 'Выберите цвет'],
-                ],
-                'color_or' => ['type'=>Form::INPUT_STATIC, 'label' => false, 'columnOptions' => ['colspan' => 2]],
-                'color_new' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 5]],
-                'ratio' => [
+                'ratio_id' => [
                     'type' => Form::INPUT_DROPDOWN_LIST, 
                     'items'=> ArrayHelper::map(Rate::find()->orderBy('name')->asArray()->all(), 'id', 'name'),
                     'columnOptions' => ['colspan' => 5],
                     'options' => ['prompt' => 'Выберите коэффициент'],
                 ],
                 'ratio_or' => ['type'=>Form::INPUT_STATIC, 'label' => false, 'columnOptions' => ['colspan' => 2]],
-                'ratio_new' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 5]],
-            ]
-        ]);
-        echo Form::widget([
-            'model' => $model,
-            'form' => $form,
-            'columns' => 1,
-            'attributes' => [
-                'size' => [
-                    'type' => Form::INPUT_MULTISELECT, 
-                    'items'=> ArrayHelper::map(Size::find()->orderBy('name')->asArray()->all(), 'id', 'name'),
-                    'columnOptions' => ['colspan' => 5],
-                    'options' => ['prompt' => 'Выберите размер(-ы)'],
-                ],
+                'ratio_new' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 5], 'options' => ['disabled' => $model->ratio_id]],
             ]
         ]);
         echo Form::widget([
@@ -96,15 +61,23 @@ use app\models\Size;
                 <label class="control-label" for="amount-description">Фактическое наличие товара</label>
                 <table class="table table-bordered" id="amount_table">
                     <tr>
+                        <th>2к</th>
+                        <th>3к</th>
                         <th>Наличие</th>
                     </tr>
                     <tr>
+                        <td><input type="number" class="form-control" value="<?= isset($model->amounts[0]) ? $model->amounts[0]->amount : 0 ?>" name="Product[amount][2k][]"></td>
+                        <td><input type="number" class="form-control" value="<?= isset($model->amounts[3]) ? $model->amounts[3]->amount : 0 ?>" name="Product[amount][3k][]"></td>
                         <td>Зал</td>
                     </tr>
                     <tr>
+                        <td><input type="number" class="form-control" value="<?= isset($model->amounts[1]) ? $model->amounts[1]->amount : 0 ?>" name="Product[amount][2k][]"></td>
+                        <td><input type="number" class="form-control" value="<?= isset($model->amounts[4]) ? $model->amounts[4]->amount : 0 ?>" name="Product[amount][3k][]"></td>
                         <td>Склад</td>
                     </tr>
                     <tr>
+                        <td><input type="number" class="form-control" value="<?= isset($model->amounts[2]) ? $model->amounts[2]->amount : 0 ?>" name="Product[amount][2k][]"></td>
+                        <td><input type="number" class="form-control" value="<?= isset($model->amounts[5]) ? $model->amounts[5]->amount : 0 ?>" name="Product[amount][3k][]"></td>
                         <td>Ждём</td>
                     </tr>
                 </table>
@@ -123,6 +96,12 @@ use app\models\Size;
             ]
         ]);
     ?>
+
+    <?php if ($model->photo): ?>
+        <div class="old_img" style="margin-bottom: 20px;">
+            <?= EasyThumbnailImage::thumbnailImg(\Yii::$app->basePath.$model->photo,100,150,EasyThumbnailImage::THUMBNAIL_OUTBOUND) ?>
+        </div>
+    <?php endif ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Добавить' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

@@ -39,7 +39,7 @@ class Amount extends \yii\db\ActiveRecord
     {
         return [
             [['product_id', 'amount_type', 'amount'], 'required'],
-            [['product_id', 'amount_type', 'amount', 'size_id', 'created_at', 'updated_at'], 'integer']
+            [['product_id', 'amount', 'size_id', 'created_at', 'updated_at'], 'integer']
         ];
     }
 

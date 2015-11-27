@@ -122,13 +122,21 @@ class ProductsController extends Controller
             if ($model->save()) {
                 //Сохранение кол-ва
                 if (isset($post['Product']['amount'])) {
-                    foreach ($post['Product']['amount'] as $size_id => $size_vals) {
-                        foreach ($size_vals as $key => $value) {
+                    foreach ($post['Product']['amount'] as $amount_key => $amount_value) {
+                        if (is_array($amount_value)) {
+                            foreach ($amount_value as $key => $value) {
+                                $new_amount = new Amount();
+                                $new_amount->product_id = $model->id;
+                                $new_amount->size_id = $amount_key;
+                                $new_amount->amount_type = $key;
+                                $new_amount->amount = $value;
+                                $new_amount->save();
+                            }
+                        } else {
                             $new_amount = new Amount();
                             $new_amount->product_id = $model->id;
-                            $new_amount->size_id = $size_id;
-                            $new_amount->amount_type = $key;
-                            $new_amount->amount = $value;
+                            $new_amount->amount_type = $amount_key;
+                            $new_amount->amount = $amount_value;
                             $new_amount->save();
                         }
                     }
@@ -239,13 +247,21 @@ class ProductsController extends Controller
                 Amount::deleteAll(['product_id' => $id]);
                 //Сохранение кол-ва
                 if (isset($post['Product']['amount'])) {
-                    foreach ($post['Product']['amount'] as $size_id => $size_vals) {
-                        foreach ($size_vals as $key => $value) {
+                    foreach ($post['Product']['amount'] as $amount_key => $amount_value) {
+                        if (is_array($amount_value)) {
+                            foreach ($amount_value as $key => $value) {
+                                $new_amount = new Amount();
+                                $new_amount->product_id = $model->id;
+                                $new_amount->size_id = $amount_key;
+                                $new_amount->amount_type = $key;
+                                $new_amount->amount = $value;
+                                $new_amount->save();
+                            }
+                        } else {
                             $new_amount = new Amount();
                             $new_amount->product_id = $model->id;
-                            $new_amount->size_id = $size_id;
-                            $new_amount->amount_type = $key;
-                            $new_amount->amount = $value;
+                            $new_amount->amount_type = $amount_key;
+                            $new_amount->amount = $amount_value;
                             $new_amount->save();
                         }
                     }

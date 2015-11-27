@@ -18,7 +18,7 @@ class ProductSearch extends Product
     public function rules()
     {
         return [
-            [['id', 'marka_id', 'model_id', 'color_id', 'ratio_id', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'category_id', 'marka_id', 'model_id', 'color_id', 'ratio_id', 'created_at', 'updated_at'], 'integer'],
             [['description', 'photo'], 'safe'],
             [['purchase_price_small', 'purchase_price_big', 'purchase_price_small_dol', 'purchase_price_big_dol', 'recommended_price_small', 'recommended_price_big', 'price_small', 'price_big'], 'number'],
         ];
@@ -42,7 +42,7 @@ class ProductSearch extends Product
      */
     public function search($params)
     {
-        $query = Product::find();
+        $query = Product::find()->where(['category_id' => $params['category_id']]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
