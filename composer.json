@@ -23,7 +23,9 @@
         "kartik-v/yii2-builder": "@dev",
         "kartik-v/yii2-widget-activeform": "@dev",
         "himiklab/yii2-easy-thumbnail-image-helper": "*",
-        "kartik-v/yii2-widget-datepicker": "@dev"
+        "kartik-v/yii2-widget-datepicker": "@dev",
+        "kartik-v/yii2-widget-alert": "*",
+        "kartik-v/yii2-widget-growl": "*"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",

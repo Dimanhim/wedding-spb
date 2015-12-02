@@ -22,13 +22,15 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $this->render('_search', ['model' => $searchModel, 'category_id' => $category->id]); ?>
     </div>
     
-    <?= 
-        $this->render('index_'.$category->type, [
-            'sizes' => $sizes,
-            'category' => $category,
-            'dataProvider' => $dataProvider
-        ]);
-    ?>
+    <form action="" id="products_form">
+        <?= 
+            $this->render('index_'.$category->type, [
+                'sizes' => $sizes,
+                'category' => $category,
+                'dataProvider' => $dataProvider
+            ]);
+        ?>
+    </form>
     
     <div class="panel panel-default" id="minicart">
         <div class="panel-heading">Заказ</div>
@@ -40,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     DatePicker::widget([
                         'language' => 'ru',
                         'type' => DatePicker::TYPE_INPUT,
-                        'name' => 'check_issue_date', 
+                        'name' => 'await_date', 
                         //'value' => date('d-M-Y'),
                         'options' => ['placeholder' => 'Введите примерную дату ожидания'],
                         'pluginOptions' => [
@@ -50,9 +52,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]);
                 ?>
             </p>
-            <?= Html::a('Покупка', Url::toRoute(['products/copy', 'id' => $this->title]), ['class' => 'btn btn-success btn-block', 'title' => 'Покупка']) ?>
-            <?= Html::a('Со склада в зал', Url::toRoute(['products/copy', 'id' => $this->title]), ['class' => 'btn btn-primary btn-block', 'title' => 'Со склада в зал']) ?>
-            <?= Html::a('Из зала на склад', Url::toRoute(['products/copy', 'id' => $this->title]), ['class' => 'btn btn-warning btn-block', 'title' => 'Из зала на склад']) ?>
+            <?= Html::a('Покупка', Url::toRoute(['orders/create']), ['class' => 'btn btn-success btn-block order_create', 'title' => 'Покупка']) ?>
+            <?= Html::a('Со склада в зал', Url::toRoute(['whmoves/create']), ['class' => 'btn btn-primary btn-block whmove_create', 'title' => 'Со склада в зал']) ?>
+            <?= Html::a('Из зала на склад', Url::toRoute(['hwmoves/create']), ['class' => 'btn btn-warning btn-block hwmove_create', 'title' => 'Из зала на склад']) ?>
         </div>
     </div>
 

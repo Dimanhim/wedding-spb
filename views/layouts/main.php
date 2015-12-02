@@ -9,6 +9,7 @@ use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 use app\models\Category;
+use kartik\alert\AlertBlock;
 
 AppAsset::register($this);
 ?>
@@ -46,13 +47,13 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => 'Товары', 'url' => ['/products/index'], 'items' => $cat_items],
-            ['label' => 'Заказы', 'url' => ['/site/about']],
-            ['label' => 'Перемещения', 'url' => ['/site/contact'], 'items' =>[
-                ['label' => 'Со склада в зал', 'url' => ['/site/about2']],
-                ['label' => 'Из зала на склад', 'url' => ['/site/about2']],
+            ['label' => 'Заказы', 'url' => ['/orders/index']],
+            ['label' => 'Перемещения', 'url' => ['/whmoves/index'], 'items' =>[
+                ['label' => 'Со склада в зал', 'url' => ['/whmoves/index']],
+                ['label' => 'Из зала на склад', 'url' => ['/hwmoves/index']],
             ]],
             ['label' => 'Продажи', 'url' => ['/site/contact']],
-            ['label' => 'Менеджеры', 'url' => ['/site/contact']],
+            ['label' => 'Менеджеры', 'url' => ['/users/index']],
             ['label' => 'Финансовый учет', 'url' => ['/site/contact']],
             ['label' => 'Справочники', 'url' => ['/site/contact'], 'items' =>[
                 ['label' => 'Категории', 'url' => ['/categories/index']],
@@ -73,6 +74,10 @@ AppAsset::register($this);
     ?>
 
     <div class="container">
+        <?= AlertBlock::widget([
+            'useSessionFlash' => true,
+            'type' => AlertBlock::TYPE_GROWL
+        ]) ?>
         <?= Breadcrumbs::widget([
             'homeLink' => [ 
                 'label' => 'Главная',

@@ -110,3 +110,8 @@ a.desc:after {
     right: 0;
     display: none;
 }
+
+
+.order_item_arrived_form{
+    width: 100px;
+}

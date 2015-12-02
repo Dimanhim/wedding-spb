@@ -66,4 +66,50 @@ $(function() {
 		});
 	}
 
+	// Корзина
+	var minicart = $('#minicart'),
+		products_form = $('#products_form');
+	if (minicart.length) {
+
+		//Создание заказа или перемещения
+		minicart.find('a.order_create, a.whmove_create, a.hwmove_create').click(function() {
+			var item = $(this),
+				await_date = minicart.find('input[name="await_date"]').val(),
+			    order_items = [];
+			$.each(products_form.find('input'), function() {
+				var input = $(this);
+				if (parseInt(input.val()) > 0) {
+					order_items.push({
+						'product_id': parseInt(input.data('product')),
+						'size_id': parseInt(input.data('size')),
+						'price': parseFloat(input.data('price')),
+						'amount': parseInt(input.val())
+					});
+				}
+			});
+			$.post(item.attr('href'), {'order_items': order_items, 'await_date': await_date}, function(data) {
+				location.reload();
+			});
+			return false;
+		});
+
+	}
+
+	//Заказы
+	$('.order_status_form select').change(function() {
+		$(this).closest('form').submit();
+	});
+
+	$('.order_item_status_form select').change(function() {
+		var item = $(this),
+			arrived = item.closest('tr').find('.order_item_arrived_form fieldset');
+		if (item.val() == 2) {
+			arrived.removeAttr('disabled');
+		} else {
+			arrived.attr('disabled', 'disabled');
+			item.closest('form').submit();
+		}
+	});
+
+
 });

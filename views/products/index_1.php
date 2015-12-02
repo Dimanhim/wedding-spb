@@ -91,7 +91,10 @@ use kartik\date\DatePicker;
         <tr class="active order_tr">
             <th colspan="6" style="text-align: right; padding-top: 11px;">заказ</th>
             <?php foreach ($sizes as $size): ?>
-                <td><input type="number" style="width: 40px;" data-price="<?= ($size->name <= 50) ? $product->price_small : $product->price_big; ?>" min="0" max="99" value="0"></td>
+                <td>
+                    <input type="number" name="items[]" data-product="<?= $product->id ?>" data-size="<?= $size->id ?>" style="width: 40px;" 
+                    data-price="<?= ($size->name <= 50) ? $product->price_small : $product->price_big; ?>" min="0" max="99" value="0">
+                </td>
             <?php endforeach ?>
             <th class="total_item_amount">0</th>
             <td></td>
