@@ -12,16 +12,16 @@ class m151130_095732_order_items extends Migration
         }
 
         $this->createTable('{{%order_items}}', [
-            'id'            => Schema::TYPE_PK,
-            'order_id'      => Schema::TYPE_INTEGER . ' NOT NULL',
-            'product_id'    => Schema::TYPE_INTEGER . ' NOT NULL',
-            'size_id'       => Schema::TYPE_INTEGER,
-            'amount'        => Schema::TYPE_INTEGER . ' NOT NULL',
-            'price'         => Schema::TYPE_FLOAT . ' NOT NULL',
-            'status'        => Schema::TYPE_INTEGER . ' NOT NULL',
-            'arrived'       => Schema::TYPE_INTEGER . ' NOT NULL DEFAULT 0',
-            'created_at'    => Schema::TYPE_INTEGER . ' NOT NULL',
-            'updated_at'    => Schema::TYPE_INTEGER . ' NOT NULL',
+            'id'                => Schema::TYPE_PK,
+            'order_id'          => Schema::TYPE_INTEGER . ' NOT NULL',
+            'product_id'        => Schema::TYPE_INTEGER . ' NOT NULL',
+            'size_id'           => Schema::TYPE_INTEGER,
+            'amount'            => Schema::TYPE_INTEGER . ' NOT NULL',
+            'price'             => Schema::TYPE_FLOAT . ' NOT NULL',
+            'delivery_status'   => Schema::TYPE_INTEGER . ' NOT NULL',
+            'arrived'           => Schema::TYPE_INTEGER . ' NOT NULL DEFAULT 0',
+            'created_at'        => Schema::TYPE_INTEGER . ' NOT NULL',
+            'updated_at'        => Schema::TYPE_INTEGER . ' NOT NULL',
         ], $tableOptions);
 
     }

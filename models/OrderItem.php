@@ -14,17 +14,16 @@ use yii\behaviors\TimestampBehavior;
  * @property integer $size_id
  * @property integer $amount
  * @property double $price
- * @property integer $status
+ * @property integer $delivery_status
  * @property integer $arrived
  * @property integer $created_at
  * @property integer $updated_at
  */
 class OrderItem extends \yii\db\ActiveRecord
 {
-    const STATUS_CANCELED   = 0;
-    const STATUS_ACTIVE     = 1;
-    const STATUS_PART_COME  = 2;
-    const STATUS_FULL_COME  = 3;
+    const DELIVERY_INIT  = 1;
+    const DELIVERY_PART  = 2;
+    const DELIVERY_FULL  = 3;
 
     /**
      * @inheritdoc
@@ -47,8 +46,8 @@ class OrderItem extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['order_id', 'product_id', 'amount', 'price', 'status'], 'required'],
-            [['order_id', 'product_id', 'size_id', 'amount', 'status', 'arrived', 'created_at', 'updated_at'], 'integer'],
+            [['order_id', 'product_id', 'amount', 'price', 'delivery_status'], 'required'],
+            [['order_id', 'product_id', 'size_id', 'amount', 'delivery_status', 'arrived', 'created_at', 'updated_at'], 'integer'],
             [['price'], 'number']
         ];
     }
@@ -69,19 +68,16 @@ class OrderItem extends \yii\db\ActiveRecord
     /**
     * Statuses
     */
-    public function getStatusLabel() {
-        switch ($this->status) {
-            case self::STATUS_CANCELED:
-                return '<span class="label label-danger">отменен</span>';
+    public function getDeliveryStatusLabel() {
+        switch ($this->delivery_status) {
+            case self::DELIVERY_INIT:
+                return '<span class="label label-primary">инициализирована</span>';
                 break;
-            case self::STATUS_ACTIVE:
-                return '<span class="label label-primary">сформирован</span>';
+            case self::DELIVERY_PART:
+                return '<span class="label label-warning">частично поступил</span>';
                 break;
-            case self::STATUS_PART_COME:
-                return '<span class="label label-warning">частично пришел</span>';
-                break;
-            case self::STATUS_FULL_COME:
-                return '<span class="label label-success">оплачен</span>';
+            case self::DELIVERY_FULL:
+                return '<span class="label label-success">полностью поступил</span>';
                 break;
             default:
                 return '<span class="label label-default">неизвестен</span>';
@@ -89,12 +85,11 @@ class OrderItem extends \yii\db\ActiveRecord
         }
     }
 
-    public function getStatuses() {
+    public function getDeliveryStatuses() {
         return [
-            self::STATUS_CANCELED => 'отменен',
-            self::STATUS_ACTIVE => 'сформирован',
-            self::STATUS_PART_COME => 'частично пришел',
-            self::STATUS_FULL_COME => 'полностью пришел',
+            self::DELIVERY_INIT => 'инициализирована',
+            self::DELIVERY_PART => 'частично поступил',
+            self::DELIVERY_FULL => 'полностью поступил',
         ];
     }
 
@@ -110,7 +105,7 @@ class OrderItem extends \yii\db\ActiveRecord
             'size_id' => 'Размер',
             'amount' => 'Количество',
             'price' => 'Сумма',
-            'status' => 'Статус',
+            'delivery_status' => 'Статус поставки',
             'arrived' => 'Пришло',
             'created_at' => 'Дата добавления',
             'updated_at' => 'Дата обновления',

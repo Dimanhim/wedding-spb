@@ -96,18 +96,13 @@ $(function() {
 	}
 
 	//Заказы
-	$('.order_status_form select').change(function() {
-		$(this).closest('form').submit();
-	});
-
-	$('.order_item_status_form select').change(function() {
+	$('form.order_update_form select, form.whmove_update_form select, form.hwmoves_update_form select').change(function() {
 		var item = $(this),
-			arrived = item.closest('tr').find('.order_item_arrived_form fieldset');
+			arrived = item.closest('tr').find('input');
 		if (item.val() == 2) {
 			arrived.removeAttr('disabled');
 		} else {
 			arrived.attr('disabled', 'disabled');
-			item.closest('form').submit();
 		}
 	});
 

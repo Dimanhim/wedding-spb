@@ -17,17 +17,23 @@ use app\models\OrderItem;
  * @property double $total_rest
  * @property integer $total_amount
  * @property double $total_price
- * @property integer $status
+ * @property integer $payment_status
+ * @property integer $delivery_status
  * @property integer $created_at
  * @property integer $updated_at
  */
 class Order extends \yii\db\ActiveRecord
 {
-    const STATUS_CANCELED   = 0;
-    const STATUS_ACTIVE     = 1;
-    const STATUS_PART_PAYED = 2;
-    const STATUS_PAYED      = 3;
-    const STATUS_FULL_COME  = 4;
+    const PAY_CASH = 1;
+    const PAY_NOCASH = 2;
+
+    const PAYMENT_INIT = 1;
+    const PAYMENT_PART = 2;
+    const PAYMENT_FULL = 3;
+
+    const DELIVERY_INIT = 1;
+    const DELIVERY_PART = 2;
+    const DELIVERY_FULL = 3;
 
     /**
      * @inheritdoc
@@ -50,8 +56,8 @@ class Order extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['await_date', 'payment', 'total_amount', 'total_price', 'status'], 'required'],
-            [['await_date', 'payment', 'total_amount', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['await_date', 'payment', 'total_amount', 'total_price', 'payment_status', 'delivery_status'], 'required'],
+            [['await_date', 'payment', 'total_amount', 'payment_status', 'delivery_status', 'created_at', 'updated_at'], 'integer'],
             [['total_payed', 'total_rest', 'total_price'], 'number']
         ];
     }
@@ -64,12 +70,13 @@ class Order extends \yii\db\ActiveRecord
         return [
             'id' => 'Id',
             'await_date' => 'Дата ожидания',
-            'payment' => 'Способ оплаты',
+            'payment' => 'Оплата',
             'total_payed' => 'Оплачено',
             'total_rest' => 'Остаток',
-            'total_amount' => 'Количество',
+            'total_amount' => 'Кол-во',
             'total_price' => 'Сумма',
-            'status' => 'Статус',
+            'payment_status' => 'Статус оплаты',
+            'delivery_status' => 'Статус поставки',
             'created_at' => 'Дата заказа',
             'updated_at' => 'Дата обновления',
         ];
@@ -86,22 +93,30 @@ class Order extends \yii\db\ActiveRecord
     /**
     * Statuses
     */
-    public function getStatusLabel() {
-        switch ($this->status) {
-            case self::STATUS_CANCELED:
-                return '<span class="label label-danger">отменен</span>';
+    public function getPayCashLabel() {
+        switch ($this->payment) {
+            case self::PAY_CASH:
+                return 'наличными';
                 break;
-            case self::STATUS_ACTIVE:
-                return '<span class="label label-primary">сформирован</span>';
+            case self::PAY_NOCASH:
+                return 'картой';
                 break;
-            case self::STATUS_PART_PAYED:
+            default:
+                return 'неизвестен';
+                break;
+        }
+    }
+
+    public function getPaymentStatusLabel() {
+        switch ($this->payment_status) {
+            case self::PAYMENT_INIT:
+                return '<span class="label label-primary">инициализирована</span>';
+                break;
+            case self::PAYMENT_PART:
                 return '<span class="label label-warning">частично оплачен</span>';
                 break;
-            case self::STATUS_PAYED:
-                return '<span class="label label-success">оплачен</span>';
-                break;
-            case self::STATUS_FULL_COME:
-                return '<span class="label label-default">полностью пришел</span>';
+            case self::PAYMENT_FULL:
+                return '<span class="label label-success">полностью оплачен</span>';
                 break;
             default:
                 return '<span class="label label-default">неизвестен</span>';
@@ -109,59 +124,37 @@ class Order extends \yii\db\ActiveRecord
         }
     }
 
-    public function getStatuses() {
+    public function getPaymentStatuses() {
         return [
-            self::STATUS_CANCELED => 'отменен',
-            self::STATUS_ACTIVE => 'сформирован',
-            self::STATUS_PART_PAYED => 'частично оплачен',
-            self::STATUS_PAYED => 'оплачен',
-            self::STATUS_FULL_COME => 'полностью пришел',
+            self::PAYMENT_INIT => 'инициализирована',
+            self::PAYMENT_PART => 'частично оплачен',
+            self::PAYMENT_FULL => 'полностью оплачен',
         ];
     }
 
-    //Меняет наличие товаров при изменении статуса заказа
-    public function updateAmountByOrderStatus($order, $status)
-    {
-        $amount_type = false;
-
-        //Если полностью пришел то переводим на Склад
-        if ($status == self::STATUS_FULL_COME) {
-            $amount_type = 1;
+    public function getDeliveryStatusLabel() {
+        switch ($this->delivery_status) {
+            case self::DELIVERY_INIT:
+                return '<span class="label label-primary">инициализирована</span>';
+                break;
+            case self::DELIVERY_PART:
+                return '<span class="label label-warning">частично поступил</span>';
+                break;
+            case self::DELIVERY_FULL:
+                return '<span class="label label-success">полностью поступил</span>';
+                break;
+            default:
+                return '<span class="label label-default">неизвестен</span>';
+                break;
         }
-
-        //Если частично или полностью оплачен, то Ждём
-        if ($status == self::STATUS_PART_PAYED or $status == self::STATUS_PAYED) {
-            $amount_type = 2;
-        }
-        
-        if ($amount_type) {
-            foreach ($order->items as $order_item) {
-                $query_arr = ['product_id' => $order_item->product_id, 'amount_type' => $amount_type];
-                if ($order_item->size_id) $query_arr['size_id'] = $order_item->size_id;
-                $amount = Amount::find()->where($query_arr)->one();
-                if ($amount) {
-                    $amount->amount += $order_item->amount;
-                    $amount->save();
-                } else{
-                    //Если такого наличия нет, то создаём
-                    $new_amount = new Amount();
-                    $new_amount->product_id = $order_item->product_id;
-                    if ($order_item->size_id) $new_amount->size_id = $order_item->size_id;
-                    $new_amount->amount_type = $amount_type;
-                    $new_amount->amount = $order_item->amount;
-                    $new_amount->save();
-                }
-
-                if ($status == self::STATUS_FULL_COME) {
-                    $order_item->status = OrderItem::STATUS_FULL_COME;
-                    $order_item->save();
-                }
-            }
-        } else {
-            return false;
-        }
-        return true;
     }
 
+    public function getDeliveryStatuses() {
+        return [
+            self::DELIVERY_INIT => 'инициализирована',
+            self::DELIVERY_PART => 'частично поступил',
+            self::DELIVERY_FULL => 'полностью поступил',
+        ];
+    }
 
 }

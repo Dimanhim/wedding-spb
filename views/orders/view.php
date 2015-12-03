@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use kartik\form\ActiveForm;
 use kartik\builder\Form;
 use yii\helpers\Url;
+use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Order */
@@ -14,8 +15,56 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="order-view">
     <h1><?= Html::encode($this->title) ?></h1>
-    <p>
-        <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+    <?= DetailView::widget([
+        'model' => $model,
+        'attributes' => [
+            'id',
+            [
+                'attribute' => 'created_at',
+                'value' => date('d.m.Y', $model->created_at),
+            ],
+            [
+                'attribute' => 'await_date',
+                'value' => date('d.m.Y', $model->await_date),
+            ],
+            'total_amount',
+            [
+                'attribute' => 'payment',
+                'value' => $model->getPayCashLabel(),
+            ],
+            [
+                'attribute' => 'total_price',
+                'format'=> ['decimal', 0]
+            ],
+            [
+                'attribute' => 'total_payed',
+                'format'=> ['decimal', 0]
+            ],
+            [
+                'attribute' => 'total_rest',
+                'format'=> ['decimal', 0]
+            ],
+            [
+                'attribute' => 'payment_status',
+                'format' => 'raw',
+                'value' => $model->getPaymentStatusLabel(),
+            ],
+            [
+                'attribute' => 'delivery_status',
+                'format' => 'raw',
+                'value' => $model->getDeliveryStatusLabel(),
+            ],
+        ],
+    ]) ?>
+    <p class="pull-right">
+        <?= Html::button('Оплачен частично', ['class' => 'btn btn-warning', 'data-toggle' => 'modal', 'data-target' => '#partPay']) ?>
+        <?= Html::a('Оплачен полностью', ['full-pay', 'id' => $model->id], [
+            'class' => 'btn btn-primary',
+            'data' => [
+                'confirm' => 'Вы уверены, что клиент всё оплатил?',
+                'method' => 'post',
+            ],
+        ]) ?>
         <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
@@ -24,7 +73,15 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
     </p>
-    
+    <br><br>
+    <h2>Товары</h2>
+    <?php
+        $form = ActiveForm::begin([
+            'type'=>ActiveForm::TYPE_HORIZONTAL,
+            'action' => Url::toRoute(['orders/items-update', 'id' => $model->id]),
+            'options' => ['class' => 'order_update_form']
+        ]);
+    ?>
     <table class="table">
         <tr>
             <th></th>
@@ -36,9 +93,9 @@ $this->params['breadcrumbs'][] = $this->title;
             <th>Статус</th>
             <th>Кол-во</th>
         </tr>
-        <?php foreach ($model->items as $key => $order_item): ?>
+        <?php foreach ($model->items as $order_item): ?>
             <tr>
-                <td><?= $key ?></td>
+                <td><?= $order_item->id ?></td>
                 <td><?= $order_item->product->model->name ?></td>
                 <td><?= $order_item->product->color->name ?></td>
                 <td><?= $order_item->size->name ?></td>
@@ -46,48 +103,36 @@ $this->params['breadcrumbs'][] = $this->title;
                 <td><?= $order_item->price ?></td>
                 <td>
                     <?php
-                        $form = ActiveForm::begin([
-                            'type'=>ActiveForm::TYPE_HORIZONTAL,
-                            'action' => Url::toRoute(['orders/change-item-status', 'id' => $order_item->id]),
-                            'options' => ['class' => 'order_item_status_form']
-                        ]);
                         echo Form::widget([
-                            'model' => $order_item,
-                            'form' => $form,
+                            'formName' => 'order_items['.$order_item->id.']',
                             'columns' => 12,
                             'attributes' => [
-                                'status' => [
+                                'delivery_status' => [
                                     'type' => Form::INPUT_DROPDOWN_LIST, 
-                                    'items'=> $order_item->getStatuses(),
+                                    'items'=> $order_item->getDeliveryStatuses(),
                                     'label' => false,
+                                    'value' => $order_item->delivery_status,
                                 ]
                             ],
-                            'options' => ($order_item->status == $order_item::STATUS_CANCELED or $order_item->status == $order_item::STATUS_ACTIVE) ? [] : ['disabled' => 'disabled'],
+                            'options' => ($order_item->delivery_status == $order_item::DELIVERY_FULL) ? ['disabled' => 'disabled'] : [],
                         ]);
-                        ActiveForm::end();
                     ?>
                 </td>
                 <td>
                     <?php
-                        $form = ActiveForm::begin([
-                            'type' => ActiveForm::TYPE_HORIZONTAL,
-                            'action' => Url::toRoute(['orders/change-item-status', 'id' => $order_item->id]),
-                            'options' => ['class' => 'order_item_arrived_form']
-                        ]);
                         echo Form::widget([
-                            'model' => $order_item,
-                            'form' => $form,
+                            'formName' => 'order_items['.$order_item->id.']',
                             'columns' => 12,
                             'attributes' => [
                                 'arrived' => [
                                     'type' => Form::INPUT_HTML5,
                                     'html5type' => 'number',
                                     'label' => false,
+                                    'value' => $order_item->arrived,
+                                    'options' => ($order_item->delivery_status == $order_item::DELIVERY_PART) ? ['type' => 'number'] : ['disabled' => 'disabled', 'type' => 'number'],
                                 ]
                             ],
-                            'options' => ($order_item->status == $order_item::STATUS_PART_COME) ? [] : ['disabled' => 'disabled'],
                         ]);
-                        ActiveForm::end();
                     ?>
                 </td>
             </tr>
@@ -103,26 +148,44 @@ $this->params['breadcrumbs'][] = $this->title;
             <th><?= $model->total_price ?></th>
         </tr>
     </table>
-    
-    <?php
-        $form = ActiveForm::begin([
-            'type'=>ActiveForm::TYPE_HORIZONTAL,
-            'action' => Url::toRoute(['orders/change-status', 'id' => $model->id]),
-            'options' => ['class' => 'order_status_form']
-        ]);
-        echo Form::widget([
-            'model' => $model,
-            'form' => $form,
-            'columns' => 12,
-            'attributes' => [
-                'status' => [
-                    'type' => Form::INPUT_DROPDOWN_LIST, 
-                    'items'=> $model->getStatuses(),
-                ]
-            ],
-            'options' => ($model->status == $model::STATUS_CANCELED or $model->status == $model::STATUS_ACTIVE) ? [] : ['disabled' => 'disabled'],
-        ]);
-        ActiveForm::end();
-    ?>
+
+    <p>
+        <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success pull-right']) ?>
+    </p>
+
+    <?php ActiveForm::end(); ?>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="partPay" tabindex="-1" role="dialog" aria-labelledby="partPayLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="partPayLabel">Частичная оплата</h4>
+                </div>
+                <div class="modal-body">
+                    <?php
+                        $form = ActiveForm::begin([
+                            'type'=>ActiveForm::TYPE_HORIZONTAL,
+                            'action' => Url::toRoute(['pay', 'id' => $model->id]),
+                        ]);
+                        echo Form::widget([
+                            'model' => $model,
+                            'form' => $form,
+                            'attributes' => [
+                                'total_payed' => [
+                                    'type' => Form::INPUT_HTML5,
+                                    'html5type' => 'number',
+                                ]
+                            ],
+                        ]);
+                    ?>
+                    <p class="text-right"><?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?></p>
+                    <?php ActiveForm::end(); ?>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>

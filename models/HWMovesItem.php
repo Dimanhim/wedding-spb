@@ -20,10 +20,9 @@ use yii\behaviors\TimestampBehavior;
  */
 class HWMovesItem extends \yii\db\ActiveRecord
 {
-    const STATUS_CANCELED   = 0;
-    const STATUS_ACTIVE     = 1;
-    const STATUS_PART_COME  = 2;
-    const STATUS_DONE       = 3;
+    const MOVE_INIT  = 1;
+    const MOVE_PART  = 2;
+    const MOVE_FULL  = 3;
 
     /**
      * @inheritdoc
@@ -86,16 +85,13 @@ class HWMovesItem extends \yii\db\ActiveRecord
     */
     public function getStatusLabel() {
         switch ($this->status) {
-            case self::STATUS_CANCELED:
-                return '<span class="label label-danger">отменен</span>';
-                break;
-            case self::STATUS_ACTIVE:
+            case self::MOVE_INIT:
                 return '<span class="label label-primary">еще в зале</span>';
                 break;
-            case self::STATUS_PART_COME:
+            case self::MOVE_PART:
                 return '<span class="label label-warning">частично пришел</span>';
                 break;
-            case self::STATUS_DONE:
+            case self::MOVE_FULL:
                 return '<span class="label label-success">уже на складе</span>';
                 break;
             default:
@@ -106,10 +102,9 @@ class HWMovesItem extends \yii\db\ActiveRecord
 
     public function getStatuses() {
         return [
-            self::STATUS_CANCELED => 'отменен',
-            self::STATUS_ACTIVE => 'еще в зале',
-            self::STATUS_PART_COME => 'частично пришел',
-            self::STATUS_DONE => 'уже на складе',
+            self::MOVE_INIT => 'еще в зале',
+            self::MOVE_PART => 'частично пришел',
+            self::MOVE_FULL => 'уже на складе',
         ];
     }
 }

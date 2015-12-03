@@ -101,6 +101,49 @@ class WhmovesController extends Controller
         return true;
     }
 
+    public function actionItemsUpdate($id) {
+        $move = $this->findModel($id);
+        $post = Yii::$app->request->post();
+
+        foreach ($post['move_items'] as $move_item_id => $move_item_data) {
+            if (($move_item = WHMovesItem::findOne($move_item_id)) !== null) {
+                //Если статус частично пришел
+                if ($move_item_data['status'] == WHMovesItem::MOVE_PART) {
+                    $arrived = (isset($move_item_data['arrived'])) ? $move_item_data['arrived'] : 0;
+                    //Если пришло больше или равно общему кол-ву, то считаем, что пришло всё
+                    if ($arrived >= $move_item->amount) {
+                        $move_item->status = WHMovesItem::MOVE_FULL;
+                        $move_item->arrived = $move_item->amount;
+                    } else {
+                        $move_item->status = WHMovesItem::MOVE_PART;
+                        $move_item->arrived = $move_item_data['arrived'];
+                    }
+                    $move->status = WHMove::MOVE_PART;
+                } elseif ($move_item_data['status'] == WHMovesItem::MOVE_FULL) {
+                    $move_item->status = WHMovesItem::MOVE_FULL;
+                    $move_item->arrived = $move_item->amount;
+                    $move->status = WHMove::MOVE_PART;
+                } else {
+                    continue;
+                }
+                $move_item->save();
+            }
+        }
+
+        //Если все товары пришли, то меняем статус у всего заказа
+        $is_move_full = true;
+        foreach ($move->items as $move_item) {
+            if ($move_item->status != WHMovesItem::MOVE_FULL)
+                $is_move_full = false;
+        }
+        if ($is_move_full) {
+            $move->status = WHMove::MOVE_FULL;
+        }
+        $move->save();
+
+        return $this->redirect(Yii::$app->request->referrer);
+    }
+
     /**
      * Deletes an existing WHMove model.
      * If deletion is successful, the browser will be redirected to the 'index' page.

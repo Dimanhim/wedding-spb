@@ -1,9 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use kartik\form\ActiveForm;
-use kartik\builder\Form;
-use yii\helpers\Url;
+use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -13,55 +11,45 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="hwmove-index">
     <h1><?= Html::encode($this->title) ?></h1>
-    <table class="table">
-        <tr>
-            <th>№</th>
-            <th>Дата перемещения</th>
-            <th>Кол-во</th>
-            <th>Статус</th>
-            <th>Действия</th>
-        </tr>
-        <?php foreach ($dataProvider->getModels() as $move): ?>
-            <tr>
-                <td><?= $move->id ?></td>
-                <td><?= date('d.m.Y H:i', $move->created_at) ?></td>
-                <td><?= $move->total_amount ?></td>
-                <td>
-                    <?php
-                        $form = ActiveForm::begin([
-                            'type'=>ActiveForm::TYPE_HORIZONTAL,
-                            'action' => Url::toRoute(['hwmoves/change-status', 'id' => $move->id]),
-                            'options' => ['class' => 'hwmoves_status_form']
-                        ]);
-                        echo Form::widget([
-                            'model' => $move,
-                            'form' => $form,
-                            'columns' => 12,
-                            'attributes' => [
-                                'status' => [
-                                    'type' => Form::INPUT_DROPDOWN_LIST, 
-                                    'items'=> $move->getStatuses(),
-                                    'label' => false,
-                                ]
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'summary' => '<div class="summary">Показаны <b>{begin}-{end}</b> из <b>{totalCount}</b> перемещений</div>',
+        'columns' => [
+            'id',
+            [
+                'attribute' => 'created_at',
+                'value'=> function($data) {
+                    return date('d.m.Y', $data->created_at);
+                }
+            ],
+            'total_amount',
+            [
+                'attribute' => 'status',
+                'format' => 'raw',
+                'value'=> function($data) {
+                    return $data->getStatusLabel();
+                }
+            ],
+            ['class' => 'yii\grid\ActionColumn', 'template' => '{view} {delete}',
+                'buttons' => [
+                    'view' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', $url, ['class' => 'btn btn-primary btn-xs', 'title' => 'Посмотреть']);
+                    },
+                    'update' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, ['class' => 'btn btn-info btn-xs', 'title' => 'Редактировать']);
+                    },
+                    'delete' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, [
+                            'class' => 'btn btn-danger btn-xs',
+                            'title' => 'Удалить',
+                            'data' => [
+                                'confirm' => 'Вы уверены, что хотите удалить перемещение?',
+                                'method' => 'post',
                             ],
-                            'options' => ($move->status == $move::STATUS_CANCELED or $move->status == $move::STATUS_ACTIVE) ? [] : ['disabled' => 'disabled'],
                         ]);
-                        ActiveForm::end();
-                    ?>
-                </td>
-                <td>
-                    <?= Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Url::toRoute(['hwmoves/view', 'id' => $move->id]), ['class' => 'btn btn-primary btn-xs', 'title' => 'Посмотреть']); ?>
-                    <?= Html::a('<span class="glyphicon glyphicon-pencil"></span>', Url::toRoute(['hwmoves/update', 'id' => $move->id]), ['class' => 'btn btn-info btn-xs', 'title' => 'Редактировать']); ?>
-                    <?= Html::a('<span class="glyphicon glyphicon-trash"></span>', Url::toRoute(['hwmoves/delete', 'id' => $move->id]), [
-                        'class' => 'btn btn-danger btn-xs',
-                        'title' => 'Удалить',
-                        'data' => [
-                            'confirm' => 'Вы уверены, что хотите удалить перемещение?',
-                            'method' => 'post',
-                        ],
-                    ]); ?>
-                </td>
-            </tr>
-        <?php endforeach ?>
-    </table>
+                    },
+                ],
+            ],
+        ],
+    ]); ?>
 </div>

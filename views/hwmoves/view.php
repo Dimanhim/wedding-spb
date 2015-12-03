@@ -4,18 +4,34 @@ use yii\helpers\Html;
 use kartik\form\ActiveForm;
 use kartik\builder\Form;
 use yii\helpers\Url;
+use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\HWMove */
 
-$this->title = $model->id;
+$this->title = 'Перемещение из зала на склад №'.$model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Перемещения из зала на склад', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="hwmove-view">
     <h1><?= Html::encode($this->title) ?></h1>
-    <p>
-        <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+    <?= DetailView::widget([
+        'model' => $model,
+        'attributes' => [
+            'id',
+            [
+                'attribute' => 'created_at',
+                'value' => date('d.m.Y', $model->created_at),
+            ],
+            'total_amount',
+            [
+                'attribute' => 'status',
+                'format' => 'raw',
+                'value' => $model->getStatusLabel(),
+            ],
+        ],
+    ]) ?>
+    <p class="pull-right">
         <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
@@ -24,6 +40,15 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
     </p>
+    <br><br>
+    <h2>Товары</h2>
+    <?php
+        $form = ActiveForm::begin([
+            'type'=>ActiveForm::TYPE_HORIZONTAL,
+            'action' => Url::toRoute(['hwmoves/items-update', 'id' => $model->id]),
+            'options' => ['class' => 'hwmoves_update_form']
+        ]);
+    ?>
     <table class="table">
         <tr>
             <th></th>
@@ -34,81 +59,54 @@ $this->params['breadcrumbs'][] = $this->title;
             <th>Статус</th>
             <th>Кол-во</th>
         </tr>
-        <?php foreach ($model->items as $key => $move_item): ?>
+        <?php foreach ($model->items as $move_item): ?>
             <tr>
-                <td><?= $key ?></td>
+                <td><?= $move_item->id ?></td>
                 <td><?= $move_item->product->model->name ?></td>
                 <td><?= $move_item->product->color->name ?></td>
                 <td><?= $move_item->size->name ?></td>
                 <td><?= $move_item->amount ?></td>
                 <td>
                     <?php
-                        $form = ActiveForm::begin([
-                            'type'=>ActiveForm::TYPE_HORIZONTAL,
-                            'action' => Url::toRoute(['orders/change-item-status', 'id' => $move_item->id]),
-                            'options' => ['class' => 'order_item_status_form']
-                        ]);
                         echo Form::widget([
-                            'model' => $move_item,
-                            'form' => $form,
+                            'formName' => 'move_items['.$move_item->id.']',
                             'columns' => 12,
                             'attributes' => [
                                 'status' => [
                                     'type' => Form::INPUT_DROPDOWN_LIST, 
                                     'items'=> $move_item->getStatuses(),
                                     'label' => false,
+                                    'value' => $move_item->status,
                                 ]
                             ],
-                            'options' => ($move_item->status == $move_item::STATUS_CANCELED or $move_item->status == $move_item::STATUS_ACTIVE) ? [] : ['disabled' => 'disabled'],
+                            'options' => ($move_item->status == $move_item::MOVE_FULL) ? ['disabled' => 'disabled'] : [],
                         ]);
-                        ActiveForm::end();
                     ?>
                 </td>
                 <td>
                     <?php
-                        $form = ActiveForm::begin([
-                            'type' => ActiveForm::TYPE_HORIZONTAL,
-                            'action' => Url::toRoute(['orders/change-item-status', 'id' => $move_item->id]),
-                            'options' => ['class' => 'order_item_arrived_form']
-                        ]);
                         echo Form::widget([
-                            'model' => $move_item,
-                            'form' => $form,
+                            'formName' => 'move_items['.$move_item->id.']',
                             'columns' => 12,
                             'attributes' => [
                                 'arrived' => [
                                     'type' => Form::INPUT_HTML5,
                                     'html5type' => 'number',
                                     'label' => false,
+                                    'value' => $move_item->arrived,
+                                    'options' => ($move_item->status == $move_item::MOVE_PART) ? ['type' => 'number'] : ['disabled' => 'disabled', 'type' => 'number'],
                                 ]
                             ],
-                            'options' => ($move_item->status == $move_item::STATUS_PART_COME) ? [] : ['disabled' => 'disabled'],
                         ]);
-                        ActiveForm::end();
                     ?>
                 </td>
             </tr>
         <?php endforeach ?>
     </table>
-    
-    <?php
-        $form = ActiveForm::begin([
-            'type'=>ActiveForm::TYPE_HORIZONTAL,
-            'action' => Url::toRoute(['orders/change-status', 'id' => $model->id]),
-            'options' => ['class' => 'order_status_form']
-        ]);
-        echo Form::widget([
-            'model' => $model,
-            'form' => $form,
-            'columns' => 12,
-            'attributes' => [
-                'status' => [
-                    'type' => Form::INPUT_DROPDOWN_LIST, 
-                    'items'=> $model->getStatuses(),
-                ]
-            ],
-            'options' => ($model->status == $model::STATUS_CANCELED or $model->status == $model::STATUS_ACTIVE) ? [] : ['disabled' => 'disabled'],
-        ]);
-        ActiveForm::end();
-    ?>
+
+    <p>
+        <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success pull-right']) ?>
+    </p>
+
+    <?php ActiveForm::end(); ?>
 </div>

@@ -92,7 +92,8 @@ class OrdersController extends Controller
             $new_order->total_price = $total_price;
             $new_order->total_payed = 0;
             $new_order->total_rest = $total_price;
-            $new_order->status = 1;
+            $new_order->payment_status = Order::PAYMENT_INIT;
+            $new_order->delivery_status = Order::DELIVERY_INIT;
             if ($new_order->save()) {
                 foreach ($order_items as $order_item) {
                     $new_order_item = new OrderItem();
@@ -101,7 +102,7 @@ class OrdersController extends Controller
                     $new_order_item->amount = $order_item['amount'];
                     $new_order_item->price = $order_item['price'];
                     $new_order_item->size_id = $order_item['size_id'];
-                    $new_order_item->status = 1;
+                    $new_order_item->delivery_status = OrderItem::DELIVERY_INIT;
                     $new_order_item->save();
                 }
             }
@@ -110,32 +111,74 @@ class OrdersController extends Controller
         return true;
     }
 
-
-    public function actionChangeStatus($id)
-    {
+    public function actionPay($id) {
         $order = $this->findModel($id);
         $post = Yii::$app->request->post();
-        $old_status = $order->status;
-        $new_status = (isset($post['Order']['status'])) ? $post['Order']['status'] : 0;
-
-        //Только если статус изменился
-        if ($new_status != $old_status) {
-            //Только для оплаченных или пришедших заказов меняем наличие у товаров
-            if ($new_status == Order::STATUS_FULL_COME or $old_status == Order::STATUS_PART_PAYED or $old_status == Order::STATUS_PAYED) {
-                //Но если не удалось обновить наличие у товаров данного заказа, то редирект
-                if (!Order::updateAmountByOrderStatus($order, $new_status)) {
-                    return $this->redirect(Yii::$app->request->referrer);
-                }
+        $payed = (isset($post['Order']['total_payed'])) ? $post['Order']['total_payed'] : 0;
+        if ($payed) {
+            $total_payed = $order->total_payed + $payed;
+            if ($total_payed >= $order->total_price) {
+                $order->total_payed = $order->total_price;
+                $order->total_rest = 0;
+                $order->payment_status = Order::PAYMENT_FULL;
             } else {
-                foreach ($order->items as $order_item) {
-                    $order_item->status = $new_status;
-                    $order_item->save();
-                }
+                $order->total_payed = $total_payed;
+                $order->total_rest = $order->total_price - $order->total_payed;
+                $order->payment_status = Order::PAYMENT_PART;
             }
-
-            $order->status = $new_status;
             $order->save();
         }
+        return $this->redirect(Yii::$app->request->referrer);
+    }
+
+    public function actionFullPay($id) {
+        $order = $this->findModel($id);
+        $order->total_payed = $order->total_price;
+        $order->total_rest = 0;
+        $order->payment_status = Order::PAYMENT_FULL;
+        $order->save();
+        return $this->redirect(Yii::$app->request->referrer);
+    }
+
+    public function actionItemsUpdate($id) {
+        $order = $this->findModel($id);
+        $post = Yii::$app->request->post();
+
+        foreach ($post['order_items'] as $order_item_id => $order_item_data) {
+            if (($order_item = OrderItem::findOne($order_item_id)) !== null) {
+                //Если статус частично пришел
+                if ($order_item_data['delivery_status'] == OrderItem::DELIVERY_PART) {
+                    $arrived = (isset($order_item_data['arrived'])) ? $order_item_data['arrived'] : 0;
+                    //Если пришло больше или равно общему кол-ву, то считаем, что пришло всё
+                    if ($arrived >= $order_item->amount) {
+                        $order_item->delivery_status = OrderItem::DELIVERY_FULL;
+                        $order_item->arrived = $order_item->amount;
+                    } else {
+                        $order_item->delivery_status = OrderItem::DELIVERY_PART;
+                        $order_item->arrived = $order_item_data['arrived'];
+                    }
+                    $order->delivery_status = Order::DELIVERY_PART;
+                } elseif ($order_item_data['delivery_status'] == OrderItem::DELIVERY_FULL) {
+                    $order_item->delivery_status = OrderItem::DELIVERY_FULL;
+                    $order_item->arrived = $order_item->amount;
+                    $order->delivery_status = Order::DELIVERY_PART;
+                } else {
+                    continue;
+                }
+                $order_item->save();
+            }
+        }
+
+        //Если все товары пришли, то меняем статус у всего заказа
+        $is_delivery_full = true;
+        foreach ($order->items as $order_item) {
+            if ($order_item->delivery_status != OrderItem::DELIVERY_FULL)
+                $is_delivery_full = false;
+        }
+        if ($is_delivery_full) {
+            $order->delivery_status = Order::DELIVERY_FULL;
+        }
+        $order->save();
 
         return $this->redirect(Yii::$app->request->referrer);
     }
