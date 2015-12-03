@@ -17,6 +17,10 @@ use yii\behaviors\TimestampBehavior;
  */
 class Amount extends \yii\db\ActiveRecord
 {
+    const TYPE_HALL      = 0;
+    const TYPE_WAREHOUSE = 1;
+    const TYPE_WAIT      = 2;
+
     /**
      * @inheritdoc
      */

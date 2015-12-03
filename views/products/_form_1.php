@@ -9,6 +9,7 @@ use app\models\Model;
 use app\models\Color;
 use app\models\Rate;
 use app\models\Size;
+use app\models\Amount;
 use himiklab\thumbnail\EasyThumbnailImage;
 
 /* @var $this yii\web\View */
@@ -134,7 +135,7 @@ use himiklab\thumbnail\EasyThumbnailImage;
                         <tr>
                             <?php foreach ($sizes as $key => $size): ?>
                                 <td>
-                                    <?php $size_amount1 = $model->getAmounts()->where(['size_id' => $key, 'amount_type' => 0])->one()->amount ?>
+                                    <?php $size_amount1 = $model->getAmounts()->where(['size_id' => $key, 'amount_type' => Amount::TYPE_HALL])->one()->amount ?>
                                     <input type="number" class="form-control" value="<?= $size_amount1 ?>" name="Product[amount][<?= $key ?>][]">
                                 </td>
                             <?php endforeach ?>
@@ -143,7 +144,7 @@ use himiklab\thumbnail\EasyThumbnailImage;
                         <tr>
                             <?php foreach ($sizes as $key => $size): ?>
                                 <td>
-                                    <?php $size_amount2 = $model->getAmounts()->where(['size_id' => $key, 'amount_type' => 1])->one()->amount ?>
+                                    <?php $size_amount2 = $model->getAmounts()->where(['size_id' => $key, 'amount_type' => Amount::TYPE_WAREHOUSE])->one()->amount ?>
                                     <input type="number" class="form-control" value="<?= $size_amount2 ?>" name="Product[amount][<?= $key ?>][]">
                                 </td>
                             <?php endforeach ?>
@@ -152,7 +153,7 @@ use himiklab\thumbnail\EasyThumbnailImage;
                         <tr>
                             <?php foreach ($sizes as $key => $size): ?>
                                 <td>
-                                    <?php $size_amount3 = $model->getAmounts()->where(['size_id' => $key, 'amount_type' => 2])->one()->amount ?>
+                                    <?php $size_amount3 = $model->getAmounts()->where(['size_id' => $key, 'amount_type' => Amount::TYPE_WAIT])->one()->amount ?>
                                     <input type="number" class="form-control" value="<?= $size_amount3 ?>" name="Product[amount][<?= $key ?>][]">
                                 </td>
                             <?php endforeach ?>
@@ -191,7 +192,7 @@ use himiklab\thumbnail\EasyThumbnailImage;
 
     <?php if ($model->photo): ?>
         <div class="old_img" style="margin-bottom: 20px;">
-            <?= EasyThumbnailImage::thumbnailImg(\Yii::$app->basePath.$model->photo,100,150,EasyThumbnailImage::THUMBNAIL_OUTBOUND) ?>
+            <?= EasyThumbnailImage::thumbnailImg(\Yii::$app->basePath.$model->photo, 100, 150, EasyThumbnailImage::THUMBNAIL_OUTBOUND) ?>
         </div>
     <?php endif ?>
 

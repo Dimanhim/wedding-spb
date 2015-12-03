@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\Order;
 use app\models\OrderItem;
+use app\models\Amount;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -79,12 +80,16 @@ class OrdersController extends Controller
         $post = Yii::$app->request->post();
         if (isset($post['order_items']) and $order_items = $post['order_items']) {
             $await_date = $post['await_date'] ? strtotime($post['await_date']) : time();
+
+            //Вычисляем общее кол-во и стоимость заказа
             $total_amount = 0;
             $total_price = 0;
             foreach ($order_items as $order_item) {
                 $total_amount += $order_item['amount'];
                 $total_price += $order_item['price'];
             }
+
+            //Создаём заказ
             $new_order = new Order();
             $new_order->await_date = $await_date ? $await_date : time();
             $new_order->payment = 1;
@@ -96,6 +101,8 @@ class OrdersController extends Controller
             $new_order->delivery_status = Order::DELIVERY_INIT;
             if ($new_order->save()) {
                 foreach ($order_items as $order_item) {
+
+                    //Создаём товар в заказе
                     $new_order_item = new OrderItem();
                     $new_order_item->order_id = $new_order->id;
                     $new_order_item->product_id = $order_item['product_id'];
@@ -104,6 +111,21 @@ class OrdersController extends Controller
                     $new_order_item->size_id = $order_item['size_id'];
                     $new_order_item->delivery_status = OrderItem::DELIVERY_INIT;
                     $new_order_item->save();
+
+                    //Меняем наличие товара
+                    $amount_query = ['product_id' => $new_order_item->product_id, 'amount_type' => Amount::TYPE_WAIT];
+                    if ($new_order_item->size) $amount_query['size_id'] = $new_order_item->size->id;
+                    if (($amount = Amount::find()->where($amount_query)->one()) !== null) {
+                        $amount->amount += $new_order_item->amount;
+                        $amount->save();
+                    } else {
+                        $new_amount = new Amount();
+                        $new_amount->product_id = $new_order_item->product_id;
+                        if ($new_order_item->size) $new_amount->size_id = $new_order_item->size->id;
+                        $new_amount->amount_type = Amount::TYPE_WAIT;
+                        $new_amount->amount = $new_order_item->amount;
+                        $new_amount->save();
+                    }
                 }
             }
         }
@@ -118,10 +140,12 @@ class OrdersController extends Controller
         if ($payed) {
             $total_payed = $order->total_payed + $payed;
             if ($total_payed >= $order->total_price) {
+                //Полностью оплачен
                 $order->total_payed = $order->total_price;
                 $order->total_rest = 0;
                 $order->payment_status = Order::PAYMENT_FULL;
             } else {
+                //Частично оплачен
                 $order->total_payed = $total_payed;
                 $order->total_rest = $order->total_price - $order->total_payed;
                 $order->payment_status = Order::PAYMENT_PART;
@@ -192,7 +216,7 @@ class OrdersController extends Controller
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
-
+        OrderItem::deleteAll(['product_id' => $id]);
         return $this->redirect(['index']);
     }
 

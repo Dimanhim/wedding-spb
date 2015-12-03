@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\WHMove;
 use app\models\WHMovesItem;
+use app\models\Amount;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -153,7 +154,7 @@ class WhmovesController extends Controller
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
-
+        WHMovesItem::deleteAll(['move_id' => $id]);
         return $this->redirect(['index']);
     }
 
