@@ -59,7 +59,7 @@ $config = [
         ]
     ],
     'params' => $params,
-    'defaultRoute' => 'site/index',
+    'defaultRoute' => 'receipts/index',
 ];
 
 // if (YII_ENV_DEV) {
