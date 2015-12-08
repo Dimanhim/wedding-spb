@@ -8,7 +8,7 @@ use app\models\ProductSearch;
 use app\models\Category;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 use yii\web\UploadedFile;
 use app\models\Mark;
 use app\models\Model;
@@ -25,7 +25,15 @@ class ProductsController extends Controller
     public function behaviors()
     {
         return [
-
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
         ];
     }
 
