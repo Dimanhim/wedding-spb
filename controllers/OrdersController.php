@@ -92,7 +92,7 @@ class OrdersController extends Controller
             //Создаём заказ
             $new_order = new Order();
             $new_order->await_date = $await_date ? $await_date : time();
-            $new_order->payment = 1;
+            $new_order->payment_type = 1;
             $new_order->total_amount = $total_amount;
             $new_order->total_price = $total_price;
             $new_order->total_payed = 0;

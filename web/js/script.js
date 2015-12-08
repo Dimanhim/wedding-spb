@@ -1,6 +1,8 @@
 $(function() {
 
 	//Общее
+	$('.fancybox').fancybox();
+	
 	var minicart = $('#minicart'),
 		total_amount_holder = minicart.find('#total_amount'),
 		total_price_holder = minicart.find('#total_price');
@@ -106,5 +108,12 @@ $(function() {
 		}
 	});
 
+	//Чек
+	var receipt_create = $('.receipt-create');
+	if (receipt_create.length) {
+		receipt_create.find('input[type="checkbox"]').change(function() {
+			$(this).closest('form').submit();
+		});
+	}
 
 });

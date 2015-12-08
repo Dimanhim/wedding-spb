@@ -12,7 +12,7 @@ use app\models\OrderItem;
  *
  * @property integer $id
  * @property integer $await_date
- * @property integer $payment
+ * @property integer $payment_type
  * @property double $total_payed
  * @property double $total_rest
  * @property integer $total_amount
@@ -56,8 +56,8 @@ class Order extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['await_date', 'payment', 'total_amount', 'total_price', 'payment_status', 'delivery_status'], 'required'],
-            [['await_date', 'payment', 'total_amount', 'payment_status', 'delivery_status', 'created_at', 'updated_at'], 'integer'],
+            [['await_date', 'payment_type', 'total_amount', 'total_price', 'payment_status', 'delivery_status'], 'required'],
+            [['await_date', 'payment_type', 'total_amount', 'payment_status', 'delivery_status', 'created_at', 'updated_at'], 'integer'],
             [['total_payed', 'total_rest', 'total_price'], 'number']
         ];
     }
@@ -70,7 +70,7 @@ class Order extends \yii\db\ActiveRecord
         return [
             'id' => 'Id',
             'await_date' => 'Дата ожидания',
-            'payment' => 'Оплата',
+            'payment_type' => 'Оплата',
             'total_payed' => 'Оплачено',
             'total_rest' => 'Остаток',
             'total_amount' => 'Кол-во',
@@ -94,7 +94,7 @@ class Order extends \yii\db\ActiveRecord
     * Statuses
     */
     public function getPayCashLabel() {
-        switch ($this->payment) {
+        switch ($this->payment_type) {
             case self::PAY_CASH:
                 return 'наличными';
                 break;

@@ -52,8 +52,8 @@ AppAsset::register($this);
                 ['label' => 'Со склада в зал', 'url' => ['/whmoves/index']],
                 ['label' => 'Из зала на склад', 'url' => ['/hwmoves/index']],
             ]],
-            ['label' => 'Продажи', 'url' => ['/site/contact']],
-            ['label' => 'Менеджеры', 'url' => ['/users/index']],
+            ['label' => 'Продажи', 'url' => ['/receipts/index']],
+            ['label' => 'Менеджеры', 'url' => ['/managers/index']],
             ['label' => 'Финансовый учет', 'url' => ['/site/contact']],
             ['label' => 'Справочники', 'url' => ['/site/contact'], 'items' =>[
                 ['label' => 'Категории', 'url' => ['/categories/index']],

@@ -14,11 +14,7 @@ class m151117_143440_users extends Migration
         $this->createTable('{{%users}}', [
             'id'        => Schema::TYPE_PK,
             'username'  => Schema::TYPE_STRING . ' NOT NULL',
-            'email'     => Schema::TYPE_STRING . ' NOT NULL',
-            'name'      => Schema::TYPE_STRING . ' NOT NULL',
-            'surname'           => Schema::TYPE_STRING . ' NOT NULL',
-            'fathername'        => Schema::TYPE_STRING,
-            'employment_date'   => Schema::TYPE_STRING . ' NOT NULL',
+            'email'     => Schema::TYPE_STRING,
 
             'auth_key'              => Schema::TYPE_STRING . '(32) NOT NULL',
             'password_hash'         => Schema::TYPE_STRING . ' NOT NULL',
@@ -34,22 +30,6 @@ class m151117_143440_users extends Migration
 
         $this->createIndex('email_index_unique', '{{%users}}', 'email', true);
         $this->createIndex('username_index_unique', '{{%users}}', 'username', true);
-
-        $this->insert('{{%users}}', [
-            'username'  => 'admin',
-            'email'     => 'info@madeinmed.ru',
-            'name'      => 'Администратор',
-            'surname'   => 'Администратор',
-
-            'auth_key'      => 'D08uUhskO3frc5t1f1G2TUOK8fQxOQ3t',
-            'password_hash' => '$2y$13$KM5JdtkTlSc3aTZouDRuXevcowCQs0EljhxI2DXgeHpnzTIpVxciG', //123456
-            
-            'role' => 'admin',
-            
-            'status'     => 10,
-            'created_at' => time(),
-            'updated_at' => time()
-        ]);
 
     }
 

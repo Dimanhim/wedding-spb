@@ -42,6 +42,7 @@ class ProductsController extends Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'pagination' => $dataProvider->getPagination(),
             'category' => $category,
             'sizes' => Size::find()->all(),
         ]);
@@ -114,8 +115,8 @@ class ProductsController extends Controller
             //Загрузка фото
             $model->photo_file = UploadedFile::getInstance($model, 'photo');
             if ($model->photo_file) {
-                $image_path = '/web/files/'.time().'.'. $model->photo_file->extension;
-                $model->photo_file->saveAs(\Yii::$app->basePath.$image_path);
+                $image_path = '/files/'.time().'.'. $model->photo_file->extension;
+                $model->photo_file->saveAs(\Yii::$app->basePath.'/web'.$image_path);
                 $model->photo = $image_path;
             }
 
@@ -160,8 +161,8 @@ class ProductsController extends Controller
 
         //Дублирование фото
         if ($model->photo) {
-            $new_filename = '/web/files/'.time().'.'. pathinfo($model->photo, PATHINFO_EXTENSION);
-            if (copy(\Yii::$app->basePath.$model->photo, \Yii::$app->basePath.$new_filename)) {
+            $new_filename = '/files/'.time().'.'. pathinfo($model->photo, PATHINFO_EXTENSION);
+            if (copy(\Yii::$app->basePath.'/web'.$model->photo, \Yii::$app->basePath.'/web'.$new_filename)) {
                 $clone->photo = $new_filename;
             }
         }
@@ -233,8 +234,8 @@ class ProductsController extends Controller
             //Загрузка фото
             $model->photo_file = UploadedFile::getInstance($model, 'photo');
             if ($model->photo_file) {
-                $image_path = '/web/files/'.time().'.'. $model->photo_file->extension;
-                $model->photo_file->saveAs(\Yii::$app->basePath.$image_path);
+                $image_path = '/files/'.time().'.'. $model->photo_file->extension;
+                $model->photo_file->saveAs(\Yii::$app->basePath.'/web'.$image_path);
                 $model->photo = $image_path;
                 //Удаление старого фото
                 if ($old_photo) unlink(\Yii::$app->basePath.$old_photo);
@@ -290,7 +291,7 @@ class ProductsController extends Controller
         //Удаление кол-ва
         Amount::deleteAll(['product_id' => $id]);
         //Удаление старого фото
-        if ($old_photo) unlink(\Yii::$app->basePath.$old_photo);
+        if ($old_photo) unlink(\Yii::$app->basePath.'/web'.$old_photo);
 
         return $this->redirect(['index', 'category_id' => $model->category->id]);
     }

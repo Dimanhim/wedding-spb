@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'total_amount',
             [
-                'attribute' => 'payment',
+                'attribute' => 'payment_type',
                 'value' => $model->getPayCashLabel(),
             ],
             [

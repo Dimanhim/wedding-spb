@@ -18,9 +18,11 @@ class AppAsset extends AssetBundle
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
+        'fancybox/source/jquery.fancybox.css',
         'css/site.css',
     ];
     public $js = [
+        'fancybox/source/jquery.fancybox.pack.js',
         'js/script.js',
     ];
     public $depends = [

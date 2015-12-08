@@ -116,7 +116,7 @@ use himiklab\thumbnail\EasyThumbnailImage;
 
     <?php if ($model->photo): ?>
         <div class="old_img" style="margin-bottom: 20px;">
-            <?= EasyThumbnailImage::thumbnailImg(\Yii::$app->basePath.$model->photo,100,150,EasyThumbnailImage::THUMBNAIL_OUTBOUND) ?>
+            <?= EasyThumbnailImage::thumbnailImg(\Yii::$app->basePath.'/web'.$model->photo,100,150,EasyThumbnailImage::THUMBNAIL_OUTBOUND) ?>
         </div>
     <?php endif ?>
 

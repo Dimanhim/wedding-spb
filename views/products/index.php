@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use himiklab\thumbnail\EasyThumbnailImage;
 use yii\helpers\Url;
 use kartik\date\DatePicker;
+use yii\widgets\LinkPager;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\ProductSearch */
@@ -21,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Добавить товар', ['create', 'category_id' => $category->id], ['class' => 'btn btn-success']) ?>
         <?= $this->render('_search', ['model' => $searchModel, 'category_id' => $category->id]); ?>
     </div>
-    
+
     <form action="" id="products_form">
         <?= 
             $this->render('index_'.$category->type, [
@@ -31,6 +32,12 @@ $this->params['breadcrumbs'][] = $this->title;
             ]);
         ?>
     </form>
+
+    <?= 
+        LinkPager::widget([
+            'pagination' => $pagination,
+        ]);
+    ?>
     
     <div class="panel panel-default" id="minicart">
         <div class="panel-heading">Заказ</div>

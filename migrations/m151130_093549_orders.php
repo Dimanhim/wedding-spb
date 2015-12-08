@@ -14,7 +14,7 @@ class m151130_093549_orders extends Migration
         $this->createTable('{{%orders}}', [
             'id'                => Schema::TYPE_PK,
             'await_date'        => Schema::TYPE_INTEGER . ' NOT NULL',
-            'payment'           => Schema::TYPE_INTEGER . ' NOT NULL',
+            'payment_type'      => Schema::TYPE_INTEGER . ' NOT NULL',
             'total_payed'       => Schema::TYPE_FLOAT,
             'total_rest'        => Schema::TYPE_FLOAT,
             //'supplier'          => Schema::TYPE_INTEGER . ' NOT NULL',

@@ -50,13 +50,21 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['username', 'email', 'name', 'surname', 'employment_date', 'auth_key', 'password_hash', 'role', 'created_at', 'updated_at'], 'required'],
+            [['username', 'auth_key', 'password_hash', 'role', 'created_at', 'updated_at'], 'required'],
             [['status', 'created_at', 'updated_at'], 'integer'],
-            [['username', 'email', 'name', 'surname', 'fathername', 'employment_date', 'password_hash', 'password_reset_token', 'email_confirm_token', 'role'], 'string', 'max' => 255],
+            [['username', 'email', 'password_hash', 'password_reset_token', 'email_confirm_token', 'role'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
             [['email'], 'unique'],
             [['username'], 'unique']
         ];
+    }
+
+    /**
+    * Relations
+    */
+    public function getManager()
+    {
+        return $this->hasOne(Manager::className(), ['manager_id' => 'id']);
     }
 
     /**
@@ -65,21 +73,17 @@ class User extends ActiveRecord implements IdentityInterface
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'username' => 'Username',
+            'id' => 'Id',
+            'username' => 'Логин',
             'email' => 'Email',
-            'name' => 'Name',
-            'surname' => 'Surname',
-            'fathername' => 'Fathername',
-            'employment_date' => 'Employment Date',
             'auth_key' => 'Auth Key',
             'password_hash' => 'Password Hash',
             'password_reset_token' => 'Password Reset Token',
             'email_confirm_token' => 'Email Confirm Token',
-            'role' => 'Role',
-            'status' => 'Status',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'role' => 'Роль',
+            'status' => 'Статус',
+            'created_at' => 'Дата добавления',
+            'updated_at' => 'Дата обновления',
         ];
     }
 

@@ -115,3 +115,37 @@ a.desc:after {
 .order_item_arrived_form{
     width: 100px;
 }
+
+.receipt_actions{
+    overflow: hidden;
+}
+.receipt_actions form{
+    float: left;
+}
+.receipt_payment .col-sm-1{
+    float: right;
+}
+
+td.amount{
+    background: #5CB85C;
+    color: #fff;
+    border: 1px solid;
+    text-align: center;
+}
+td.amount_2,
+td.amount_3,
+td.amount_4{
+    background: #F0AD4E;
+}
+td.amount_0,
+td.amount_1{
+    background: #D9534F;
+}
+th.amount_th{
+    text-align: center;
+    border: 1px solid #fff;
+}
+td.amount_inp{
+    text-align: center;
+    border: 1px solid #fff;
+}
