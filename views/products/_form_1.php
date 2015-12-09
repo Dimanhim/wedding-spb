@@ -135,7 +135,7 @@ use himiklab\thumbnail\EasyThumbnailImage;
                         <tr>
                             <?php foreach ($sizes as $key => $size): ?>
                                 <td>
-                                    <?php $size_amount1 = $model->getAmounts()->where(['size_id' => $key, 'amount_type' => Amount::TYPE_HALL])->one()->amount ?>
+                                    <?php $size_amount1 = Amount::find()->where(['product_id' => $model->id, 'size_id' => $key, 'amount_type' => Amount::TYPE_HALL])->one()->amount ?>
                                     <input type="number" class="form-control" value="<?= $size_amount1 ?>" name="Product[amount][<?= $key ?>][]">
                                 </td>
                             <?php endforeach ?>
@@ -144,7 +144,7 @@ use himiklab\thumbnail\EasyThumbnailImage;
                         <tr>
                             <?php foreach ($sizes as $key => $size): ?>
                                 <td>
-                                    <?php $size_amount2 = $model->getAmounts()->where(['size_id' => $key, 'amount_type' => Amount::TYPE_WAREHOUSE])->one()->amount ?>
+                                    <?php $size_amount2 = Amount::find()->where(['product_id' => $model->id, 'size_id' => $key, 'amount_type' => Amount::TYPE_WAREHOUSE])->one()->amount ?>
                                     <input type="number" class="form-control" value="<?= $size_amount2 ?>" name="Product[amount][<?= $key ?>][]">
                                 </td>
                             <?php endforeach ?>
@@ -153,7 +153,7 @@ use himiklab\thumbnail\EasyThumbnailImage;
                         <tr>
                             <?php foreach ($sizes as $key => $size): ?>
                                 <td>
-                                    <?php $size_amount3 = $model->getAmounts()->where(['size_id' => $key, 'amount_type' => Amount::TYPE_WAIT])->one()->amount ?>
+                                    <?php $size_amount3 = Amount::find()->where(['product_id' => $model->id, 'size_id' => $key, 'amount_type' => Amount::TYPE_WAIT])->one()->amount ?>
                                     <input type="number" class="form-control" value="<?= $size_amount3 ?>" name="Product[amount][<?= $key ?>][]">
                                 </td>
                             <?php endforeach ?>

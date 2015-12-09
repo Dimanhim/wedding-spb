@@ -51,7 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'type' => DatePicker::TYPE_INPUT,
                         'name' => 'await_date', 
                         //'value' => date('d-M-Y'),
-                        'options' => ['placeholder' => 'Введите примерную дату ожидания'],
+                        'options' => ['placeholder' => 'Дата действия'],
                         'pluginOptions' => [
                             'format' => 'dd.mm.yyyy',
                             'todayHighlight' => true

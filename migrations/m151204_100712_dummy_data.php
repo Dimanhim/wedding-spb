@@ -135,12 +135,13 @@ class m151204_100712_dummy_data extends Migration
 
             $sizes = rand(1, 4);
             for ($j = 1; $j <= $sizes; $j++) {
+                $size = rand(1, 5);
                 for ($k = 0; $k < 3; $k++) { 
                     $this->insert('{{%amounts}}', [
                         'product_id'  => $i,
                         'amount_type' => $k,
                         'amount' => rand(0, 10),
-                        'size_id' => rand(1, 5),
+                        'size_id' => $size,
                         'created_at' => $time,
                         'updated_at' => $time
                     ]);

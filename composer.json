@@ -25,7 +25,8 @@
         "himiklab/yii2-easy-thumbnail-image-helper": "*",
         "kartik-v/yii2-widget-datepicker": "@dev",
         "kartik-v/yii2-widget-alert": "*",
-        "kartik-v/yii2-widget-growl": "*"
+        "kartik-v/yii2-widget-growl": "*",
+        "kop/yii2-scroll-pager": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",

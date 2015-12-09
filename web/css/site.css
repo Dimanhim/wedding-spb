@@ -104,7 +104,7 @@ a.desc:after {
 }
 
 #minicart{
-    width: 300px;
+    width: 200px;
     position: fixed;
     top: 69px;
     right: 0;
@@ -148,4 +148,31 @@ th.amount_th{
 td.amount_inp{
     text-align: center;
     border: 1px solid #fff;
+}
+
+.signature, .transcript{
+    border-top: 1px solid #000;
+    display: inline-block;
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 10px;
+    margin-right: 50px;
+}
+.signature{
+    width: 150px;
+}
+.transcript{
+    width: 300px;
+}
+
+
+
+@media print {
+    footer, .breadcrumb, h1{
+        display: none;
+    }
+    body{
+        font-size: 12px;
+    }
+    @page{size:auto; margin-bottom:5mm;}
 }

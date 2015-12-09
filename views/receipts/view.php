@@ -14,7 +14,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Чеки', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="receipt-create">
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1><?= Html::encode($this->title) ?> <?= Html::a('Печать', 'javascript: print();', ['class' => 'btn btn-primary pull-right', 'title' => 'Печать']) ?></a></h1>
     <p>Организация: <strong>ИР Аронов ГЗ</strong> ИНН: <strong>781300200468</strong>  Магазин: <strong>Праздник</strong></p>
     <p>Товарный чек от <strong><?= date('d.m.Y', $model->created_at) ?></strong>. Продавец - <strong><?= Yii::$app->user->identity->username ?></strong></p>
     
@@ -70,30 +70,26 @@ $this->params['breadcrumbs'][] = $this->title;
             <th colspan="2"></th>
         </tr>
     </table>
+    <div class="summary">
+        <p>
+            Всего наименований <?= $model->total_amount ?>,
+            на сумму <?= Yii::$app->formatter->asDecimal($model->total_price, 0) ?>
+            (<?= Yii::$app->formatter->asSpellout($model->total_price) ?>) рублей
+        </p>
+        <p>
+            Скидки и подарки, на сумму <?= Yii::$app->formatter->asDecimal($model->sale, 0) ?>
+            (<?= Yii::$app->formatter->asSpellout($model->sale) ?>) рублей
+        </p>
+    </div>
     <hr>
     <div class="receipt_payment">
-        <?php
-            $form = ActiveForm::begin(['type' => ActiveForm::TYPE_HORIZONTAL, 'action' => Url::toRoute(['save', 'id' => $model->id])]);
-            echo Form::widget([
-                'model' => $model,
-                'form' => $form,
-                'columns' => 12,
-                'attributes' => [
-                    'payment_type' => [
-                        'type' => Form::INPUT_DROPDOWN_LIST, 
-                        'items' => $model->getPayCashes(),
-                        'columnOptions' => ['colspan' => 4],
-                        'options' => ['prompt' => 'Выберите оплату', 'disabled' => 'disabled'],
-                    ],
-                    'change' => [
-                        'type' => Form::INPUT_TEXT,
-                        'options' => ['type' => 'number'],
-                        'columnOptions' => ['colspan' => 4],
-                        'options' => ['disabled' => 'disabled'],
-                    ],
-                ]
-            ]);
-            ActiveForm::end();
-        ?>
+        <p>Оплата: <strong><?= $model->getPayCashLabel() ?></strong></p>
+        <p>Сдача: <strong><?= Yii::$app->formatter->asDecimal($model->change, 2) ?></strong></p>
+    </div>
+    <hr>
+    <div class="consent">
+        <p>Товар осмотрен, к внешнему виду претензий не имею.</p>
+        <span class="signature">подпись</span>
+        <span class="transcript">расшифровка</span>
     </div>
 </div>
