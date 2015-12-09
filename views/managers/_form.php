@@ -21,7 +21,6 @@ use kartik\datecontrol\DateControl;
     <?= $form->field($manager, 'employment_date')->widget(DateControl::classname(), [
         'language' => 'ru',
         'type' => DateControl::FORMAT_DATE,
-        'ajaxConversion' => false,
         'options' => [
             'pluginOptions' => [
                 'autoclose' => true,
