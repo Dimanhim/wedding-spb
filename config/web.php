@@ -1,5 +1,5 @@
 <?php
-
+use kartik\datecontrol\Module;
 $params = require(__DIR__ . '/params.php');
 
 $config = [
@@ -56,6 +56,21 @@ $config = [
     'modules' => [
         'gridview' =>  [
             'class' => '\kartik\grid\Module'
+        ],
+        'datecontrol' =>  [
+            'class' => 'kartik\datecontrol\Module',
+            'displaySettings' => [
+                Module::FORMAT_DATE => 'dd.MM.yyyy',
+                Module::FORMAT_TIME => 'hh:mm:ss a',
+                Module::FORMAT_DATETIME => 'dd-MM-yyyy hh:mm:ss a', 
+            ],
+            'saveSettings' => [
+                Module::FORMAT_DATE => 'php:U', // saves as unix timestamp
+                Module::FORMAT_TIME => 'php:H:i:s',
+                Module::FORMAT_DATETIME => 'php:Y-m-d H:i:s',
+            ],
+            'saveTimezone' => 'Europe/Moscow',
+            'displayTimezone' => 'Europe/Moscow',
         ]
     ],
     'params' => $params,

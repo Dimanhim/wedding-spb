@@ -2,21 +2,35 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use kartik\datecontrol\DateControl;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Manager */
+/* @var $manager app\models\Manager */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
 <div class="manager-form">
     <?php $form = ActiveForm::begin(); ?>
-    <?= $form->field($model, 'user_id')->textInput() ?>
-    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'surname')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'fathername')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'employment_date')->textInput() ?>
+    <?= $form->errorSummary($manager) ?>
+    <?= $form->field($manager, 'surname')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($manager, 'name')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($manager, 'fathername')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($manager, 'email')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($manager, 'password')->passwordInput(['maxlength' => true]) ?>
+    <?= $form->field($manager, 'password_copy')->passwordInput(['maxlength' => true]) ?>
+    <?= $form->field($manager, 'employment_date')->widget(DateControl::classname(), [
+        'language' => 'ru',
+        'type' => DateControl::FORMAT_DATE,
+        'ajaxConversion' => false,
+        'options' => [
+            'pluginOptions' => [
+                'autoclose' => true,
+                'endDate' => 'today'
+            ]
+        ]
+    ]); ?>
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($manager->isNewRecord ? 'Добавить' : 'Сохранить', ['class' => $manager->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
     <?php ActiveForm::end(); ?>
 </div>

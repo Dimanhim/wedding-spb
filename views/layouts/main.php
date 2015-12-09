@@ -64,7 +64,7 @@ AppAsset::register($this);
                 ['label' => 'Коэффициенты', 'url' => ['/rates/index']],
             ]],
             [
-                'label' => 'Выход (' . Yii::$app->user->identity->username . ')',
+                'label' => 'Выход',
                 'url' => ['/site/logout'],
                 'linkOptions' => ['data-method' => 'post']
             ],

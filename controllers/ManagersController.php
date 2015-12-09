@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Manager;
+use app\models\User;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -51,8 +52,22 @@ class ManagersController extends Controller
      */
     public function actionView($id)
     {
+        $manager = $this->findModel($id);
+        $post = Yii::$app->request->post();
+        if (isset($post['Manager'])) {
+            $manager->vacation_start = strtotime($post['vacation_start']);
+            $manager->vacation_end = strtotime($post['vacation_end']);
+            $manager->salary_date = $post['Manager']['salary_date'];
+            $manager->advance_date = $post['Manager']['advance_date'];
+            $manager->save();
+        }
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $manager->getReceipts(),
+        ]);
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $manager,
+            'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -63,15 +78,29 @@ class ManagersController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Manager();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+        $manager = new Manager();
+        $manager->scenario = 'create';
+        $user = new User();
+        $post = Yii::$app->request->post();
+        if (isset($post['Manager']['email'])) {
+            $user->username = $post['Manager']['email'];
+            $user->role = 'manager';
+            $user->status = 10;
+            $user->email = $post['Manager']['email'];
+            $user->setPassword($post['Manager']['password']);
+            if ($user->save()) {
+                $manager->load($post);
+                $manager->user_id = $user->id;
+                if ($manager->save()) {
+                    return $this->redirect(['view', 'id' => $manager->id]);
+                }
+            }
         }
+
+        return $this->render('create', [
+            'manager' => $manager,
+            'user' => $user,
+        ]);
     }
 
     /**
@@ -101,8 +130,9 @@ class ManagersController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
+        $manager = $this->findModel($id);
+        $manager->user->delete();
+        $manager->delete();
         return $this->redirect(['index']);
     }
 

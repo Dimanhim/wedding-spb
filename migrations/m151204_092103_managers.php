@@ -18,6 +18,10 @@ class m151204_092103_managers extends Migration
             'surname'           => Schema::TYPE_STRING . ' NOT NULL',
             'fathername'        => Schema::TYPE_STRING,
             'employment_date'   => Schema::TYPE_INTEGER . ' NOT NULL',
+            'vacation_start'    => Schema::TYPE_INTEGER,
+            'vacation_end'      => Schema::TYPE_INTEGER,
+            'advance_date'      => Schema::TYPE_INTEGER,
+            'salary_date'       => Schema::TYPE_INTEGER,
             'created_at'        => Schema::TYPE_INTEGER . ' NOT NULL',
             'updated_at'        => Schema::TYPE_INTEGER . ' NOT NULL',
         ], $tableOptions);
