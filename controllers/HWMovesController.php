@@ -113,6 +113,8 @@ class HwmovesController extends Controller
                 //Если статус частично пришел
                 if ($move_item_data['status'] == HWMovesItem::MOVE_PART) {
                     $arrived = (isset($move_item_data['arrived'])) ? $move_item_data['arrived'] : 0;
+                    $old_arrived = $move_item->arrived ? $move_item->arrived : 0;
+
                     //Если пришло больше или равно общему кол-ву, то считаем, что пришло всё
                     if ($arrived >= $move_item->amount) {
                         $move_item->status = HWMovesItem::MOVE_FULL;
@@ -122,10 +124,24 @@ class HwmovesController extends Controller
                         $move_item->arrived = $move_item_data['arrived'];
                     }
                     $move->status = HWMove::MOVE_PART;
+
+                    //Меняем кол-во в зале и на складе
+                    $diff_arived = $move_item->arrived - $old_arrived;
+                    $move->moveItem($move_item, Amount::TYPE_WAREHOUSE, $diff_arived, true);
+                    $move->moveItem($move_item, Amount::TYPE_HALL, $diff_arived, false);
+
                 } elseif ($move_item_data['status'] == HWMovesItem::MOVE_FULL) {
+                    $old_arrived = $move_item->arrived ? $move_item->arrived : 0;
+                    
                     $move_item->status = HWMovesItem::MOVE_FULL;
                     $move_item->arrived = $move_item->amount;
                     $move->status = HWMove::MOVE_PART;
+
+                    //Меняем кол-во в зале и на складе
+                    $diff_arived = $move_item->arrived - $old_arrived;
+                    $move->moveItem($move_item, Amount::TYPE_WAREHOUSE, $diff_arived, true);
+                    $move->moveItem($move_item, Amount::TYPE_HALL, $diff_arived, false);
+
                 } else {
                     continue;
                 }

@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use Yii;
+use app\models\Product;
 use app\models\Order;
 use app\models\OrderItem;
 use app\models\Amount;
@@ -100,6 +101,7 @@ class OrdersController extends Controller
             $new_order->total_price = $total_price;
             $new_order->total_payed = 0;
             $new_order->total_rest = $total_price;
+            $new_order->accepted = 0;
             $new_order->payment_status = Order::PAYMENT_INIT;
             $new_order->delivery_status = Order::DELIVERY_INIT;
             if ($new_order->save()) {
@@ -115,20 +117,10 @@ class OrdersController extends Controller
                     $new_order_item->delivery_status = OrderItem::DELIVERY_INIT;
                     $new_order_item->save();
 
-                    //Меняем наличие товара
-                    $amount_query = ['product_id' => $new_order_item->product_id, 'amount_type' => Amount::TYPE_WAIT];
-                    if ($new_order_item->size) $amount_query['size_id'] = $new_order_item->size->id;
-                    if (($amount = Amount::find()->where($amount_query)->one()) !== null) {
-                        $amount->amount += $new_order_item->amount;
-                        $amount->save();
-                    } else {
-                        $new_amount = new Amount();
-                        $new_amount->product_id = $new_order_item->product_id;
-                        if ($new_order_item->size) $new_amount->size_id = $new_order_item->size->id;
-                        $new_amount->amount_type = Amount::TYPE_WAIT;
-                        $new_amount->amount = $new_order_item->amount;
-                        $new_amount->save();
-                    }
+                    //Ставим дату продажи
+                    $product = Product::findOne($order_item['product_id']);
+                    $product->purchase_date = time();
+                    $product->save();
                 }
             }
         }
@@ -153,6 +145,7 @@ class OrdersController extends Controller
                 $order->total_rest = $order->total_price - $order->total_payed;
                 $order->payment_status = Order::PAYMENT_PART;
             }
+            $order->acceptOrder();
             $order->save();
         }
         return $this->redirect(Yii::$app->request->referrer);
@@ -163,6 +156,7 @@ class OrdersController extends Controller
         $order->total_payed = $order->total_price;
         $order->total_rest = 0;
         $order->payment_status = Order::PAYMENT_FULL;
+        $order->acceptOrder();
         $order->save();
         return $this->redirect(Yii::$app->request->referrer);
     }
@@ -176,6 +170,8 @@ class OrdersController extends Controller
                 //Если статус частично пришел
                 if ($order_item_data['delivery_status'] == OrderItem::DELIVERY_PART) {
                     $arrived = (isset($order_item_data['arrived'])) ? $order_item_data['arrived'] : 0;
+                    $old_arrived = $order_item->arrived ? $order_item->arrived : 0;
+
                     //Если пришло больше или равно общему кол-ву, то считаем, что пришло всё
                     if ($arrived >= $order_item->amount) {
                         $order_item->delivery_status = OrderItem::DELIVERY_FULL;
@@ -185,10 +181,25 @@ class OrdersController extends Controller
                         $order_item->arrived = $order_item_data['arrived'];
                     }
                     $order->delivery_status = Order::DELIVERY_PART;
+
+                    //Меняем кол-во на складе и в ожидании
+                    $diff_arived = $order_item->arrived - $old_arrived;
+                    $order->acceptOrderItem($order_item, Amount::TYPE_WAREHOUSE, $diff_arived, true);
+                    $order->acceptOrderItem($order_item, Amount::TYPE_WAIT, $diff_arived, false);
+
+                //Если статус полностью пришел
                 } elseif ($order_item_data['delivery_status'] == OrderItem::DELIVERY_FULL) {
+                    $old_arrived = $order_item->arrived ? $order_item->arrived : 0;
+                    
                     $order_item->delivery_status = OrderItem::DELIVERY_FULL;
                     $order_item->arrived = $order_item->amount;
                     $order->delivery_status = Order::DELIVERY_PART;
+
+                    //Меняем кол-во на складе и в ожидании
+                    $diff_arived = $order_item->arrived - $old_arrived;
+                    $order->acceptOrderItem($order_item, Amount::TYPE_WAREHOUSE, $diff_arived, true);
+                    $order->acceptOrderItem($order_item, Amount::TYPE_WAIT, $diff_arived, false);
+
                 } else {
                     continue;
                 }

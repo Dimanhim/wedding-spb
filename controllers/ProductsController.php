@@ -117,8 +117,13 @@ class ProductsController extends Controller
 
             //Расчет рекомендуемых цен
             $curr_rate = Rate::findOne($model->ratio_id)->name;
-            $model->recommended_price_small = $model->purchase_price_small * $curr_rate;
-            $model->recommended_price_big = $model->purchase_price_big * $curr_rate;
+            if (in_array($category->type, [2, 4, 6])) {
+                $model->recommended_price = $model->purchase_price * $curr_rate;
+            } else {
+                $model->recommended_price_small = $model->purchase_price_small * $curr_rate;
+                $model->recommended_price_big = $model->purchase_price_big * $curr_rate;
+            }
+            
 
             //Загрузка фото
             $model->photo_file = UploadedFile::getInstance($model, 'photo');
@@ -236,8 +241,12 @@ class ProductsController extends Controller
 
             //Расчет рекомендуемых цен
             $curr_rate = Rate::findOne($model->ratio_id)->name;
-            $model->recommended_price_small = $model->purchase_price_small * $curr_rate;
-            $model->recommended_price_big = $model->purchase_price_big * $curr_rate;
+            if (in_array($model->category->type, [2, 4, 6])) {
+                $model->recommended_price = $model->purchase_price * $curr_rate;
+            } else {
+                $model->recommended_price_small = $model->purchase_price_small * $curr_rate;
+                $model->recommended_price_big = $model->purchase_price_big * $curr_rate;
+            }
 
             //Загрузка фото
             $model->photo_file = UploadedFile::getInstance($model, 'photo');

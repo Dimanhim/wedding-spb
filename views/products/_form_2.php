@@ -88,14 +88,11 @@ use himiklab\thumbnail\EasyThumbnailImage;
         echo Form::widget([
             'model' => $model,
             'form' => $form,
-            'columns' => 2,
+            'columns' => 12,
             'attributes' => [
-                'purchase_price_small' => ['type'=>Form::INPUT_TEXT],
-                'purchase_price_big' => ['type'=>Form::INPUT_TEXT],
-                'purchase_price_small_dol' => ['type'=>Form::INPUT_TEXT],
-                'purchase_price_big_dol' => ['type'=>Form::INPUT_TEXT],
-                'price_small' => ['type'=>Form::INPUT_TEXT],
-                'price_big' => ['type'=>Form::INPUT_TEXT],
+                'purchase_price' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 4]],
+                'purchase_price_dol' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 4]],
+                'price' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 4]],
             ]
         ]);
     ?>

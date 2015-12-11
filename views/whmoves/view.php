@@ -31,15 +31,17 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ],
     ]) ?>
-    <p class="pull-right">
-        <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Вы уверены, что хотите удалить перемещение?',
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
+    <?php if ($model->status == $model::MOVE_INIT): ?>
+        <p class="pull-right">
+            <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
+                'class' => 'btn btn-danger',
+                'data' => [
+                    'confirm' => 'Вы уверены, что хотите удалить перемещение?',
+                    'method' => 'post',
+                ],
+            ]) ?>
+        </p>
+    <?php endif ?>
     <br><br>
     <h2>Товары</h2>
     <?php

@@ -79,14 +79,11 @@ use himiklab\thumbnail\EasyThumbnailImage;
         echo Form::widget([
             'model' => $model,
             'form' => $form,
-            'columns' => 2,
+            'columns' => 12,
             'attributes' => [
-                'purchase_price_small' => ['type'=>Form::INPUT_TEXT],
-                'purchase_price_big' => ['type'=>Form::INPUT_TEXT],
-                'purchase_price_small_dol' => ['type'=>Form::INPUT_TEXT],
-                'purchase_price_big_dol' => ['type'=>Form::INPUT_TEXT],
-                'price_small' => ['type'=>Form::INPUT_TEXT],
-                'price_big' => ['type'=>Form::INPUT_TEXT],
+                'purchase_price' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 4]],
+                'purchase_price_dol' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 4]],
+                'price' => ['type'=>Form::INPUT_TEXT, 'columnOptions' => ['colspan' => 4]],
             ]
         ]);
     ?>
@@ -101,15 +98,15 @@ use himiklab\thumbnail\EasyThumbnailImage;
                         <th>Наличие</th>
                     </tr>
                     <tr>
-                        <td><input type="number" class="form-control" value="0" name="Product[amount][]"></td>
+                        <td><input type="number" class="form-control" value="<?= isset($model->amounts[0]) ? $model->amounts[0]->amount : 0 ?>" name="Product[amount][]"></td>
                         <td>Зал</td>
                     </tr>
                     <tr>
-                        <td><input type="number" class="form-control" value="0" name="Product[amount][]"></td>
+                        <td><input type="number" class="form-control" value="<?= isset($model->amounts[1]) ? $model->amounts[1]->amount : 0 ?>" name="Product[amount][]"></td>
                         <td>Склад</td>
                     </tr>
                     <tr>
-                        <td><input type="number" class="form-control" value="0" name="Product[amount][]"></td>
+                        <td><input type="number" class="form-control" value="<?= isset($model->amounts[2]) ? $model->amounts[2]->amount : 0 ?>" name="Product[amount][]"></td>
                         <td>Ждём</td>
                     </tr>
                 </table>

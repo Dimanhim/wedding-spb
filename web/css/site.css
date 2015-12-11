@@ -104,11 +104,11 @@ a.desc:after {
 }
 
 #minicart{
-    width: 200px;
+    width: 210px;
     position: fixed;
     top: 69px;
     right: 0;
-    display: none;
+    /*display: none;*/
 }
 
 
@@ -175,4 +175,45 @@ td.amount_inp{
         font-size: 12px;
     }
     @page{size:auto; margin-bottom:5mm;}
+}
+
+.repeating_settings{
+    display: none;
+}
+.checkbox_list{
+    overflow: hidden;
+}
+.field-operation-months,
+.field-operation-days,
+.field-operation-week{
+    width: 50%;
+    float: left;
+    overflow: hidden;
+}
+#operation-months label,
+#operation-days label,
+#operation-week label{
+    display: block;
+}
+#operation-months{
+    -webkit-column-count: 4;
+    -moz-column-count: 4;
+    column-count: 4;
+}
+#operation-days{
+    -webkit-column-count: 4;
+    -moz-column-count: 4;
+    column-count: 4;
+}
+#operation-week{
+    -webkit-column-count: 4;
+    -moz-column-count: 4;
+    column-count: 4;
+}
+.fastCheck {
+    float: left;
+    margin: 10px 20px;
+}
+.fastCheck a{
+    display: block;
 }

@@ -15,7 +15,7 @@ use app\models\Size;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="collapse" id="products_filter">
+<div class="collapse in" id="products_filter">
     <div class="well">
         <?php
             $form = ActiveForm::begin([
@@ -31,34 +31,34 @@ use app\models\Size;
                     'marka_id' => [
                         'type' => Form::INPUT_DROPDOWN_LIST, 
                         'items'=> ArrayHelper::map(Mark::find()->orderBy('name')->asArray()->all(), 'id', 'name'),
-                        'columnOptions' => ['colspan' => 12],
+                        'columnOptions' => ['colspan' => 3],
                         'options' => ['prompt' => 'Выберите марку'],
                     ],
                     'model_id' => [
                         'type' => Form::INPUT_DROPDOWN_LIST, 
                         'items'=> ArrayHelper::map(Model::find()->orderBy('name')->asArray()->all(), 'id', 'name'),
-                        'columnOptions' => ['colspan' => 12],
+                        'columnOptions' => ['colspan' => 3],
                         'options' => ['prompt' => 'Выберите модель'],
                     ],
                     'color_id' => [
                         'type' => Form::INPUT_DROPDOWN_LIST, 
                         'items'=> ArrayHelper::map(Color::find()->orderBy('name')->asArray()->all(), 'id', 'name'),
-                        'columnOptions' => ['colspan' => 12],
+                        'columnOptions' => ['colspan' => 3],
                         'options' => ['prompt' => 'Выберите цвет'],
                     ],
                     'ratio_id' => [
                         'type' => Form::INPUT_DROPDOWN_LIST, 
                         'items'=> ArrayHelper::map(Rate::find()->orderBy('name')->asArray()->all(), 'id', 'name'),
-                        'columnOptions' => ['colspan' => 12],
+                        'columnOptions' => ['colspan' => 3],
                         'options' => ['prompt' => 'Выберите коэффициент'],
                     ],
                 ]
             ]);
         ?>
-        <div class="form-group">
-            <?= Html::submitButton('Найти', ['class' => 'btn btn-primary']) ?>
+        <!-- <div class="form-group text-right">
             <?= Html::a('Сбросить', ['index', 'category_id' => $category_id], ['class' => 'btn btn-default']) ?>
-        </div>
+            <?= Html::submitButton('Найти', ['class' => 'btn btn-primary']) ?>
+        </div> -->
         <?php ActiveForm::end(); ?>
     </div>
 </div>

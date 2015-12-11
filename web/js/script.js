@@ -64,7 +64,11 @@ $(function() {
 				total_price += parseInt(amount_input_item.data('price')) * amount_input_val;
 			});
 			total_amount_holder.text(total_amount);
-			total_price_holder.text(total_price);
+			total_price_holder.text(total_price.toLocaleString());
+		});
+
+		$('#products_filter select').change(function() {
+			$(this).closest('form').submit();
 		});
 	}
 
@@ -115,5 +119,67 @@ $(function() {
 			$(this).closest('form').submit();
 		});
 	}
+
+	//Финансовые операции
+	var operation_repeated = $('#operation-repeated'),
+		repeating_settings = $('.repeating_settings');
+	if (operation_repeated.is(':checked')) {
+		repeating_settings.show();
+	}
+	operation_repeated.change(function() {
+		if ($(this).is(':checked')) {
+			repeating_settings.show();
+		} else {
+			repeating_settings.hide();
+		}
+	});
+
+	$('.fastCheck a').click(function() {
+		var item = $(this),
+			chkbxs = item.closest('.checkbox_list').find('input:checkbox'),
+			action = item.attr('rel'),
+			chk_arr = [];
+		chkbxs.prop('checked', false);
+		switch (action) {
+			case 'chk_all':
+				chkbxs.prop('checked', true);
+				break
+			case 'unchk_all':
+				chkbxs.prop('checked', false);
+				break
+			case 'winter':
+				chk_arr = [1,2,12];
+				break
+			case 'spring':
+				chk_arr = [3,4,5];
+				break
+			case 'summer':
+				chk_arr = [6,7,8];
+				break
+			case 'autumn':
+				chk_arr = [9,10,11];
+				break
+			case 'work':
+				chk_arr = [1,2,3,4,5];
+				break
+			case 'weekend':
+				chk_arr = [6,7];
+				break     
+			case 'even':
+				chkbxs.each(function(i) {if((i+1) % 2 == 0) $(this).prop('checked', true);})
+				break
+			case 'odd':
+				chkbxs.each(function(i) {if((i+1) % 2 == 1) $(this).prop('checked', true);})
+				break
+		}
+
+		if (chk_arr.length) {
+			chkbxs.each(function(i) {
+				if(chk_arr.indexOf(i+1) != -1) $(this).prop('checked', true);
+			});
+		}
+
+		return false;
+	});
 
 });

@@ -95,4 +95,24 @@ class HWMove extends \yii\db\ActiveRecord
             self::MOVE_FULL => 'уже на складе',
         ];
     }
+
+    public function moveItem($move_item, $amount_type, $amount_val, $is_add) {
+        $amount_query = ['product_id' => $move_item->product_id, 'amount_type' => $amount_type];
+        if ($move_item->size) $amount_query['size_id'] = $move_item->size->id;
+        if (($amount = Amount::find()->where($amount_query)->one()) !== null) {
+            if ($is_add) {
+                $amount->amount += $amount_val;
+            } else {
+                $amount->amount -= $amount_val;
+            }
+            $amount->save();
+        } else {
+            $new_amount = new Amount();
+            $new_amount->product_id = $move_item->product_id;
+            if ($move_item->size) $new_amount->size_id = $move_item->size->id;
+            $new_amount->amount_type = $amount_type;
+            $new_amount->amount = $amount_val;
+            $new_amount->save();
+        }
+    }
 }

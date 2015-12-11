@@ -19,6 +19,7 @@ use app\models\OrderItem;
  * @property double $total_price
  * @property integer $payment_status
  * @property integer $delivery_status
+ * @property integer $accepted
  * @property integer $created_at
  * @property integer $updated_at
  */
@@ -57,7 +58,7 @@ class Order extends \yii\db\ActiveRecord
     {
         return [
             [['await_date', 'payment_type', 'total_amount', 'total_price', 'payment_status', 'delivery_status'], 'required'],
-            [['await_date', 'payment_type', 'total_amount', 'payment_status', 'delivery_status', 'created_at', 'updated_at'], 'integer'],
+            [['await_date', 'payment_type', 'total_amount', 'payment_status', 'delivery_status', 'created_at', 'updated_at', 'accepted'], 'integer'],
             [['total_payed', 'total_rest', 'total_price'], 'number']
         ];
     }
@@ -77,6 +78,7 @@ class Order extends \yii\db\ActiveRecord
             'total_price' => 'Сумма',
             'payment_status' => 'Статус оплаты',
             'delivery_status' => 'Статус поставки',
+            'accepted' => 'Принят',
             'created_at' => 'Дата заказа',
             'updated_at' => 'Дата обновления',
         ];
@@ -155,6 +157,49 @@ class Order extends \yii\db\ActiveRecord
             self::DELIVERY_PART => 'частично поступил',
             self::DELIVERY_FULL => 'полностью поступил',
         ];
+    }
+
+    public function acceptOrder() {
+        if (!$this->accepted) {
+            //Меняем наличие товара
+            foreach ($this->items as $order_item) {
+                $amount_query = ['product_id' => $order_item->product_id, 'amount_type' => Amount::TYPE_WAIT];
+                if ($order_item->size) $amount_query['size_id'] = $order_item->size->id;
+                if (($amount = Amount::find()->where($amount_query)->one()) !== null) {
+                    $amount->amount += $order_item->amount;
+                    $amount->save();
+                } else {
+                    $new_amount = new Amount();
+                    $new_amount->product_id = $order_item->product_id;
+                    if ($order_item->size) $new_amount->size_id = $order_item->size->id;
+                    $new_amount->amount_type = Amount::TYPE_WAIT;
+                    $new_amount->amount = $order_item->amount;
+                    $new_amount->save();
+                }
+            }
+
+            $this->accepted = 1;
+        }
+    }
+
+    public function acceptOrderItem($order_item, $amount_type, $amount_val, $is_add) {
+        $amount_query = ['product_id' => $order_item->product_id, 'amount_type' => $amount_type];
+        if ($order_item->size) $amount_query['size_id'] = $order_item->size->id;
+        if (($amount = Amount::find()->where($amount_query)->one()) !== null) {
+            if ($is_add) {
+                $amount->amount += $amount_val;
+            } else {
+                $amount->amount -= $amount_val;
+            }
+            $amount->save();
+        } else {
+            $new_amount = new Amount();
+            $new_amount->product_id = $order_item->product_id;
+            if ($order_item->size) $new_amount->size_id = $order_item->size->id;
+            $new_amount->amount_type = $amount_type;
+            $new_amount->amount = $amount_val;
+            $new_amount->save();
+        }
     }
 
 }

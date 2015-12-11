@@ -69,10 +69,10 @@ use yii\helpers\Url;
         <tr>
             <td><?= $product->color->name ?></td>
             <td></td>
-            <td>12.06.15</td>
+            <td><?= $product->purchase_date ? date('d.m.Y', $product->purchase_date) : '-' ?></td>
             <td></td>
-            <td>2,0</td>
-            <td>22.06.15</td>
+            <td><?= $product->ratio->name ?></td>
+            <td><?= $product->sell_date ? date('d.m.Y', $product->sell_date) : '-' ?></td>
             <?php foreach ($sizes as $size): ?>
                 <?php
                     $amount_size = $product->getAmounts()->where(['size_id' => $size->id, 'amount_type' => 2])->one();
@@ -89,7 +89,10 @@ use yii\helpers\Url;
         <tr class="active order_tr">
             <th colspan="6" style="text-align: right; padding-top: 11px;">заказ</th>
             <?php foreach ($sizes as $size): ?>
-                <td class="amount_inp"><input type="number" style="width: 40px;" min="0" max="99" value="0"></td>
+                <td class="amount_inp">
+                    <input type="number" name="items[]" data-product="<?= $product->id ?>" data-size="<?= $size->id ?>" style="width: 40px;" 
+                    data-price="<?= ($size->name <= 50) ? $product->price_small : $product->price_big; ?>" min="0" max="99" value="0">
+                </td>
             <?php endforeach ?>
             <th class="total_item_amount">0</th>
             <td></td>

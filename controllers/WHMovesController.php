@@ -114,6 +114,8 @@ class WhmovesController extends Controller
                 //Если статус частично пришел
                 if ($move_item_data['status'] == WHMovesItem::MOVE_PART) {
                     $arrived = (isset($move_item_data['arrived'])) ? $move_item_data['arrived'] : 0;
+                    $old_arrived = $move_item->arrived ? $move_item->arrived : 0;
+
                     //Если пришло больше или равно общему кол-ву, то считаем, что пришло всё
                     if ($arrived >= $move_item->amount) {
                         $move_item->status = WHMovesItem::MOVE_FULL;
@@ -123,10 +125,31 @@ class WhmovesController extends Controller
                         $move_item->arrived = $move_item_data['arrived'];
                     }
                     $move->status = WHMove::MOVE_PART;
+
+                    //Меняем кол-во на складе и в зале
+                    $diff_arived = $move_item->arrived - $old_arrived;
+                    $move->moveItem($move_item, Amount::TYPE_HALL, $diff_arived, true);
+                    $move->moveItem($move_item, Amount::TYPE_WAREHOUSE, $diff_arived, false);
+
+                    //Ставим дату продажи
+                    $move_item->product->sell_date = time();
+                    $move_item->product->save();
+
                 } elseif ($move_item_data['status'] == WHMovesItem::MOVE_FULL) {
+                    $old_arrived = $move_item->arrived ? $move_item->arrived : 0;
+                    
                     $move_item->status = WHMovesItem::MOVE_FULL;
                     $move_item->arrived = $move_item->amount;
                     $move->status = WHMove::MOVE_PART;
+
+                    //Меняем кол-во на складе и в зале
+                    $diff_arived = $move_item->arrived - $old_arrived;
+                    $move->moveItem($move_item, Amount::TYPE_HALL, $diff_arived, true);
+                    $move->moveItem($move_item, Amount::TYPE_WAREHOUSE, $diff_arived, false);
+
+                    //Ставим дату продажи
+                    $move_item->product->sell_date = time();
+                    $move_item->product->save();
                 } else {
                     continue;
                 }

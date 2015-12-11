@@ -71,10 +71,10 @@ use kartik\date\DatePicker;
         <tr>
             <td><?= $product->color->name ?></td>
             <td></td>
-            <td>12.06.15</td>
+            <td><?= $product->purchase_date ? date('d.m.Y', $product->purchase_date) : '-' ?></td>
             <td></td>
-            <td>2,0</td>
-            <td>22.06.15</td>
+            <td><?= $product->ratio->name ?></td>
+            <td><?= $product->sell_date ? date('d.m.Y', $product->sell_date) : '-' ?></td>
             <?php foreach ($sizes as $size): ?>
                 <?php
                     $amount_size = $product->getAmounts()->where(['size_id' => $size->id, 'amount_type' => 2])->one();

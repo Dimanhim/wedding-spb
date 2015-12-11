@@ -145,6 +145,49 @@ class ReceiptsController extends Controller
     {
         $model = $this->findModel($id);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            //Меняем кол-во в зале
+            foreach ($model->items as $receipt_item) {
+                //Получаем наличие в зале
+                $amount_query = ['product_id' => $receipt_item->product_id, 'amount_type' => Amount::TYPE_HALL];
+                if ($receipt_item->size_id) $amount_query['size_id'] = $receipt_item->size_id;
+                if (($amount = Amount::find()->where($amount_query)->one()) !== null) {
+                    //Проверяем достаточно ли в зале товара
+                    if ($amount->amount >= $receipt_item->amount) {
+                        $amount->amount -= $receipt_item->amount;
+                    } else {
+                        //Получаем наличие на складе
+                        $amount_query2 = ['product_id' => $receipt_item->product_id, 'amount_type' => Amount::TYPE_WAREHOUSE];
+                        if ($receipt_item->size_id) $amount_query2['size_id'] = $receipt_item->size_id;
+                        if (($amount2 = Amount::find()->where($amount_query2)->one()) !== null) {
+                            //Проверяем достаточно ли в зале и на складе вместе
+                            if (($amount->amount + $amount2->amount) >= $receipt_item->amount) {
+                                $amount->amount = 0;
+                                $remain = $receipt_item->amount - $amount->amount;
+                                $amount2->amount -= $remain;
+                                $amount2->save();
+                            } else {
+                                //Недостаточно товара в зале и на складе
+                                return $this->redirect(Yii::$app->request->referrer);
+                            }
+                        }
+                    }
+                    $amount->save();
+                } else {
+                    $amount_query2 = ['product_id' => $receipt_item->product_id, 'amount_type' => Amount::TYPE_WAREHOUSE];
+                    if ($receipt_item->size_id) $amount_query['size_id'] = $receipt_item->size_id;
+                    if (($amount = Amount::find()->where($amount_query)->one()) !== null) {
+                        if ($amount->amount >= $receipt_item->amount) {
+                            $amount->amount -= $receipt_item->amount;
+                        } else {
+                            //Недостаточно товара на складе
+                            return $this->redirect(Yii::$app->request->referrer);
+                        }
+                    } else {
+                        //Недостаточно товара в зале и на складе
+                        return $this->redirect(Yii::$app->request->referrer);
+                    }
+                }
+            }
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->redirect(Yii::$app->request->referrer);

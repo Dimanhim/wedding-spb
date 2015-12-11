@@ -22,6 +22,7 @@ class m151130_093549_orders extends Migration
             'total_price'       => Schema::TYPE_FLOAT . ' NOT NULL',
             'payment_status'    => Schema::TYPE_INTEGER . ' NOT NULL',
             'delivery_status'   => Schema::TYPE_INTEGER . ' NOT NULL',
+            'accepted'          => Schema::TYPE_BOOLEAN,
             'created_at'        => Schema::TYPE_INTEGER . ' NOT NULL',
             'updated_at'        => Schema::TYPE_INTEGER . ' NOT NULL',
         ], $tableOptions);

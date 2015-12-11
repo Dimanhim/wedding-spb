@@ -5,6 +5,7 @@ use yii\db\Migration;
 
 use app\models\Product;
 use app\models\Amount;
+use app\models\Rate;
 
 class m151204_100712_dummy_data extends Migration
 {
@@ -112,6 +113,8 @@ class m151204_100712_dummy_data extends Migration
             $category_id = rand(1, 16);
             $price = rand(1000, 50000);
             $image = rand(1, 4);
+            $rate_id = rand(1, 5);
+            $rate = Rate::findOne($rate_id);
 
             $this->insert('{{%products}}', [
                 'id' => $i,
@@ -120,15 +123,16 @@ class m151204_100712_dummy_data extends Migration
                 'model_id'     => rand(1, 5),
                 'color_id'     => rand(1, 5),
                 'photo' => '/files/'.$image.'.jpeg',
-                'purchase_price_small' => $price,
+                'purchase_price' => $price - 1000,
+                'purchase_price_small' => $price - 1000,
                 'purchase_price_big' => $price,
-                'purchase_price_small_dol' => $price,
-                'purchase_price_big_dol' => $price,
-                'recommended_price_small' => $price,
-                'recommended_price_big' => $price,
+                'recommended_price' => round(($price - 1000) * (float) $rate->name),
+                'recommended_price_small' => round(($price - 1000) * (float) $rate->name),
+                'recommended_price_big' => round($price * (float) $rate->name),
+                'price' => $price,
                 'price_small' => $price,
-                'price_big' => $price,
-                'ratio_id' => rand(1, 5),
+                'price_big' => $price + 1000,
+                'ratio_id' => $rate_id,
                 'created_at' => $time,
                 'updated_at' => $time
             ]);

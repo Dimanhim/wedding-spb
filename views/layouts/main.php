@@ -54,7 +54,7 @@ AppAsset::register($this);
             ]],
             ['label' => 'Продажи', 'url' => ['/receipts/index']],
             ['label' => 'Менеджеры', 'url' => ['/managers/index']],
-            ['label' => 'Финансовый учет', 'url' => ['/site/contact']],
+            ['label' => 'Финансовый учет', 'url' => ['/operations/index']],
             ['label' => 'Справочники', 'url' => ['/site/contact'], 'items' =>[
                 ['label' => 'Категории', 'url' => ['/categories/index']],
                 ['label' => 'Марки', 'url' => ['/marks/index']],
