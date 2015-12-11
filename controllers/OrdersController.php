@@ -7,6 +7,7 @@ use app\models\Product;
 use app\models\Order;
 use app\models\OrderItem;
 use app\models\Amount;
+use app\models\Operation;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -145,19 +146,46 @@ class OrdersController extends Controller
                 $order->total_rest = $order->total_price - $order->total_payed;
                 $order->payment_status = Order::PAYMENT_PART;
             }
+            $order->payment_type = $post['Order']['payment_type'];
             $order->acceptOrder();
             $order->save();
+
+            //Добавляем операцию в отчет
+            $operation = new Operation();
+            $operation->name = 'Частичная оплата заказа №'.$order->id;
+            $operation->type_id = Operation::TYPE_EXPENSE;
+            $operation->cat_id = Operation::CAT_BUY;
+            $operation->payment_type = $post['Order']['payment_type'];
+            $operation->total_price = $payed;
+            $operation->user_id = Yii::$app->user->id;
+            $operation->save();
         }
         return $this->redirect(Yii::$app->request->referrer);
     }
 
     public function actionFullPay($id) {
+        $post = Yii::$app->request->post();
+
         $order = $this->findModel($id);
+        $old_payed = $order->total_payed;
+
         $order->total_payed = $order->total_price;
         $order->total_rest = 0;
+        $order->payment_type = $post['Order']['payment_type'];
         $order->payment_status = Order::PAYMENT_FULL;
         $order->acceptOrder();
         $order->save();
+
+        //Добавляем операцию в отчет
+        $operation = new Operation();
+        $operation->name = 'Оплата заказа №'.$order->id;
+        $operation->type_id = Operation::TYPE_EXPENSE;
+        $operation->cat_id = Operation::CAT_BUY;
+        $operation->payment_type = $post['Order']['payment_type'];
+        $operation->total_price = ($order->total_price - $old_payed);
+        $operation->user_id = Yii::$app->user->id;
+        $operation->save();
+
         return $this->redirect(Yii::$app->request->referrer);
     }
 

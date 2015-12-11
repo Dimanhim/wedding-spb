@@ -37,22 +37,22 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php foreach ($days as $day): ?>
             <tr>
                 <td><?= date('d.m.Y', $day) ?></td>
-                <td><?= $operations[date('j', $day)]['day_income_nal'] ?></td>
-                <td><?= $operations[date('j', $day)]['day_income_beznal'] ?></td>
-                <td><?= $operations[date('j', $day)]['day_expense_nal'] ?></td>
-                <td><?= $operations[date('j', $day)]['day_expense_beznal'] ?></td>
-                <td><?= $operations[date('j', $day)]['day_summary'] ?></td>
+                <td><?= Yii::$app->formatter->asDecimal($operations[date('j', $day)]['day_income_nal'], 0) ?></td>
+                <td><?= Yii::$app->formatter->asDecimal($operations[date('j', $day)]['day_income_beznal'], 0) ?></td>
+                <td><?= Yii::$app->formatter->asDecimal($operations[date('j', $day)]['day_expense_nal'], 0) ?></td>
+                <td><?= Yii::$app->formatter->asDecimal($operations[date('j', $day)]['day_expense_beznal'], 0) ?></td>
+                <td><?= Yii::$app->formatter->asDecimal($operations[date('j', $day)]['day_summary'], 0) ?></td>
                 <td>-</td>
                 <td>-</td>
             </tr>
         <?php endforeach ?>
         <tr class="active">
             <th>Итого</th>
-            <th><?= $total['total_income_nal'] ?></th>
-            <th><?= $total['total_income_beznal'] ?></th>
-            <th><?= $total['total_expense_nal'] ?></th>
-            <th><?= $total['total_expense_beznal'] ?></th>
-            <th><?= $total['total_summary'] ?></th>
+            <th><?= Yii::$app->formatter->asDecimal($total['total_income_nal'], 0) ?></th>
+            <th><?= Yii::$app->formatter->asDecimal($total['total_income_beznal'], 0) ?></th>
+            <th><?= Yii::$app->formatter->asDecimal($total['total_expense_nal'], 0) ?></th>
+            <th><?= Yii::$app->formatter->asDecimal($total['total_expense_beznal'], 0) ?></th>
+            <th><?= Yii::$app->formatter->asDecimal($total['total_summary'], 0) ?></th>
             <th>-</th>
             <th>-</th>
         </tr>

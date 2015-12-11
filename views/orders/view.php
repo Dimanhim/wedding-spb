@@ -61,13 +61,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= Html::button('Оплачен частично', ['class' => 'btn btn-warning', 'data-toggle' => 'modal', 'data-target' => '#partPay']) ?>
         <?php endif ?>
         <?php if ($model->payment_status != $model::PAYMENT_FULL): ?>
-            <?= Html::a('Оплачен полностью', ['full-pay', 'id' => $model->id], [
-                'class' => 'btn btn-primary',
-                'data' => [
-                    'confirm' => 'Вы уверены, что клиент всё оплатил?',
-                    'method' => 'post',
-                ],
-            ]) ?>
+            <?= Html::button('Оплачен полностью', ['class' => 'btn btn-primary', 'data-toggle' => 'modal', 'data-target' => '#fullPay']) ?>
         <?php endif ?>
         <?php if ($model->payment_status == $model::PAYMENT_INIT and $model->delivery_status == $model::DELIVERY_INIT): ?>
             <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
@@ -184,6 +178,43 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'total_payed' => [
                                         'type' => Form::INPUT_HTML5,
                                         'html5type' => 'number',
+                                    ],
+                                    'payment_type' => [
+                                        'type' => Form::INPUT_DROPDOWN_LIST,
+                                        'items'=> $model->getPaymentTypes(),
+                                    ]
+                                ],
+                            ]);
+                        ?>
+                        <p class="text-right"><?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?></p>
+                        <?php ActiveForm::end(); ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif ?>
+
+    <?php if ($model->payment_status != $model::PAYMENT_FULL): ?>
+        <div class="modal fade" id="fullPay" tabindex="-1" role="dialog" aria-labelledby="fullPayLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="fullPayLabel">Оплачен полностью</h4>
+                    </div>
+                    <div class="modal-body">
+                        <?php
+                            $form = ActiveForm::begin([
+                                'type'=>ActiveForm::TYPE_HORIZONTAL,
+                                'action' => Url::toRoute(['full-pay', 'id' => $model->id]),
+                            ]);
+                            echo Form::widget([
+                                'model' => $model,
+                                'form' => $form,
+                                'attributes' => [
+                                    'payment_type' => [
+                                        'type' => Form::INPUT_DROPDOWN_LIST,
+                                        'items'=> $model->getPaymentTypes(),
                                     ]
                                 ],
                             ]);

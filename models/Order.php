@@ -109,6 +109,13 @@ class Order extends \yii\db\ActiveRecord
         }
     }
 
+    public function getPaymentTypes() {
+        return [
+            self::PAY_CASH => 'наличными',
+            self::PAY_NOCASH => 'картой',
+        ];
+    }
+
     public function getPaymentStatusLabel() {
         switch ($this->payment_status) {
             case self::PAYMENT_INIT:

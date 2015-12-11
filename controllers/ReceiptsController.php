@@ -7,6 +7,7 @@ use app\models\Receipt;
 use app\models\ReceiptItem;
 use app\models\Product;
 use app\models\Amount;
+use app\models\Operation;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -73,7 +74,7 @@ class ReceiptsController extends Controller
         $receipt->price = 0;
         $receipt->total_price = 0;
         $receipt->change = 0;
-        $receipt->manager_id = rand(1, 13);
+        $receipt->manager_id = Yii::$app->user->id;
         $receipt->save();
 
         return $this->redirect(['update', 'id' => $receipt->id]);
@@ -188,6 +189,18 @@ class ReceiptsController extends Controller
                     }
                 }
             }
+
+            //Добавляем операцию в отчет
+            $operation = new Operation();
+            $operation->name = 'Чек №'.$model->id;
+            $operation->type_id = Operation::TYPE_INCOME;
+            $operation->cat_id = Operation::CAT_SELL;
+            $operation->payment_type = $model->payment_type + 1;
+            $operation->total_price = $model->total_price;
+            $operation->user_id = Yii::$app->user->id;
+            $operation->save();
+
+
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->redirect(Yii::$app->request->referrer);
