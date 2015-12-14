@@ -15,7 +15,7 @@ use app\models\Size;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="collapse in" id="products_filter">
+<div class="collapse in" id="filter_block">
     <div class="well">
         <?php
             $form = ActiveForm::begin([

@@ -79,6 +79,8 @@ class Receipt extends \yii\db\ActiveRecord
             'change' => 'Сдача',
             'manager_id' => 'Менеджер',
             'created_at' => 'Дата добавления',
+            'created_at_begin' => 'Дата добавления',
+            'created_at_end' => 'Дата добавления',
             'updated_at' => 'Дата обновления',
         ];
     }

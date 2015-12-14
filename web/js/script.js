@@ -67,7 +67,7 @@ $(function() {
 			total_price_holder.text(total_price.toLocaleString());
 		});
 
-		$('#products_filter select').change(function() {
+		$('.product-index #filter_block select').change(function() {
 			$(this).closest('form').submit();
 		});
 	}

@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\HWMove;
 use app\models\HWMovesItem;
+use app\models\HWMoveSearch;
 use app\models\Amount;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
@@ -37,11 +38,11 @@ class HwmovesController extends Controller
      */
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => HWMove::find(),
-        ]);
-
+        $searchModel = new HWMoveSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        
         return $this->render('index', [
+            'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }

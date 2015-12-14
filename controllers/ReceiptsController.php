@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\Receipt;
 use app\models\ReceiptItem;
+use app\models\ReceiptSearch;
 use app\models\Product;
 use app\models\Amount;
 use app\models\Operation;
@@ -39,11 +40,11 @@ class ReceiptsController extends Controller
      */
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => Receipt::find(),
-        ]);
-
+        $searchModel = new ReceiptSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        
         return $this->render('index', [
+            'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }

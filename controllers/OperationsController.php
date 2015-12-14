@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Operation;
+use app\models\OperationSearch;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -30,12 +31,25 @@ class OperationsController extends Controller
      * Lists all Operation models.
      * @return mixed
      */
-    public function actionIndex($start_date = false, $end_date = false)
+    public function actionIndex()
     {
-        if (!$start_date) $start_date = strtotime(date('Y-m-01'));
-        if (!$end_date) $end_date = strtotime(date('Y-m-t'));
+        $searchModel = new OperationSearch();
 
-        $timestamp = $start_date;
+        if (!isset($_GET['OperationSearch']['date_start'])) {
+            $date_start = strtotime(date('Y-m-01'));
+        } else {
+            $date_start = strtotime($_GET['OperationSearch']['date_start']);
+        }
+        if (!isset($_GET['OperationSearch']['date_end'])) {
+            $date_end = strtotime(date('Y-m-t'));
+        } else {
+            $date_end = strtotime($_GET['OperationSearch']['date_end']) + 86399;
+        }
+
+        $searchModel->date_start = date('d.m.Y', $date_start);
+        $searchModel->date_end = date('d.m.Y', $date_end);
+
+        $timestamp = $date_start;
         $operations = [];
         $days = [];
 
@@ -43,9 +57,11 @@ class OperationsController extends Controller
         $total_income_beznal = 0;
         $total_expense_nal = 0;
         $total_expense_beznal = 0;
+        $total_planned_nal = 0;
+        $total_planned_beznal = 0;
         $total_summary = 0;
 
-        while($timestamp <= $end_date) {
+        while($timestamp <= $date_end) {
             $beginOfDay = strtotime("midnight", $timestamp);
             $endOfDay   = strtotime("tomorrow", $beginOfDay) - 1;
 
@@ -53,7 +69,10 @@ class OperationsController extends Controller
             $day_income_beznal = 0;
             $day_expense_nal = 0;
             $day_expense_beznal = 0;
+            $day_planned_nal = 0;
+            $day_planned_beznal = 0;
             $day_summary = 0;
+            //$day_operations = Operation::find()->where(['between', 'created_at', $beginOfDay, $endOfDay])->andWhere(['!=', 'repeated', 1])->all();
             $day_operations = Operation::find()->where(['between', 'created_at', $beginOfDay, $endOfDay])->all();
             foreach ($day_operations as $day_operation) {
                 if ($day_operation->type_id == Operation::TYPE_INCOME) {
@@ -68,14 +87,27 @@ class OperationsController extends Controller
                     $total_summary += $day_operation->total_price;
                 } else {
                     if ($day_operation->payment_type == Operation::PAY_CASH) {
-                        $day_expense_nal += $day_operation->total_price;
-                        $total_expense_nal += $day_operation->total_price;
+                        if ($day_operation->repeated) {
+                            $day_planned_nal += $day_operation->total_price;
+                            $total_planned_nal += $day_operation->total_price;
+                        } else {
+                            $day_expense_nal += $day_operation->total_price;
+                            $total_expense_nal += $day_operation->total_price;
+                        }
                     } else {
-                        $day_expense_beznal += $day_operation->total_price;
-                        $total_expense_beznal += $day_operation->total_price;
+                        if ($day_operation->repeated) {
+                            $day_planned_beznal += $day_operation->total_price;
+                            $total_planned_beznal += $day_operation->total_price;
+                        } else {
+                            $day_expense_beznal += $day_operation->total_price;
+                            $total_expense_beznal += $day_operation->total_price;
+                        }
                     }
-                    $day_summary -= $day_operation->total_price;
-                    $total_summary -= $day_operation->total_price;
+                    //Плюсуем к итого, только если не запланирована
+                    if (!$day_operation->repeated) {
+                        $day_summary -= $day_operation->total_price;
+                        $total_summary -= $day_operation->total_price;
+                    }
                 }
             }
             $operations[date('j', $timestamp)] = [
@@ -83,6 +115,8 @@ class OperationsController extends Controller
                 'day_income_beznal' => $day_income_beznal,
                 'day_expense_nal' => $day_expense_nal,
                 'day_expense_beznal' => $day_expense_beznal,
+                'day_planned_nal' => $day_planned_nal,
+                'day_planned_beznal' => $day_planned_beznal,
                 'day_summary' => $day_summary,
             ];
             
@@ -91,6 +125,7 @@ class OperationsController extends Controller
         }
 
         return $this->render('index', [
+            'searchModel' => $searchModel,
             'operations' => $operations,
             'days' => $days,
             'total' => [
@@ -98,6 +133,8 @@ class OperationsController extends Controller
                 'total_income_beznal' => $total_income_beznal,
                 'total_expense_nal' => $total_expense_nal,
                 'total_expense_beznal' => $total_expense_beznal,
+                'total_planned_nal' => $total_planned_nal,
+                'total_planned_beznal' => $total_planned_beznal,
                 'total_summary' => $total_summary,
             ]
         ]);
@@ -131,6 +168,11 @@ class OperationsController extends Controller
                 'model' => $model,
             ]);
         }
+    }
+
+    public function actionCronCreate()
+    {
+        return Operation::createFromCron();
     }
 
     /**

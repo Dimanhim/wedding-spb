@@ -11,6 +11,12 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="hwmove-index">
     <h1><?= Html::encode($this->title) ?></h1>
+    
+    <div class="search_block">
+        <a class="btn btn-primary" role="button" data-toggle="collapse" href="#filter_block" aria-expanded="false" aria-controls="filter_block">Фильтры</a>
+        <?= $this->render('_search', ['model' => $searchModel]); ?>
+    </div>
+
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'summary' => '<div class="summary">Показаны <b>{begin}-{end}</b> из <b>{totalCount}</b> перемещений</div>',

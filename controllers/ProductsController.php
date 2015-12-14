@@ -9,6 +9,7 @@ use app\models\Category;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
+use yii\data\ActiveDataProvider;
 use yii\web\UploadedFile;
 use app\models\Mark;
 use app\models\Model;
@@ -16,6 +17,7 @@ use app\models\Color;
 use app\models\Rate;
 use app\models\Amount;
 use app\models\Size;
+use app\models\OrderItem;
 
 /**
  * ProductsController implements the CRUD actions for Product model.
@@ -67,6 +69,11 @@ class ProductsController extends Controller
         return $this->render('view', [
             'model' => $model,
             'category' => $model->category,
+            'sizes' => Size::find()->all(),
+            'dataProvider' => new ActiveDataProvider([
+                //'query' => OrderItem::find()->where(['product_id' => $id])->groupBy(['order_id']),
+                'query' => OrderItem::find()->where(['product_id' => $id]),
+            ]),
         ]);
     }
 

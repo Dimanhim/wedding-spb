@@ -11,9 +11,13 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="receipt-index">
     <h1><?= Html::encode($this->title) ?></h1>
-    <p>
+    
+    <div class="search_block">
+        <a class="btn btn-primary" role="button" data-toggle="collapse" href="#filter_block" aria-expanded="false" aria-controls="filter_block">Фильтры</a>
         <?= Html::a('Добавить чек', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+        <?= $this->render('_search', ['model' => $searchModel]); ?>
+    </div>
+
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'summary' => '<div class="summary">Показаны <b>{begin}-{end}</b> из <b>{totalCount}</b> чеков</div>',

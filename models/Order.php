@@ -36,6 +36,7 @@ class Order extends \yii\db\ActiveRecord
     const DELIVERY_PART = 2;
     const DELIVERY_FULL = 3;
 
+
     /**
      * @inheritdoc
      */
@@ -71,6 +72,8 @@ class Order extends \yii\db\ActiveRecord
         return [
             'id' => 'Id',
             'await_date' => 'Дата ожидания',
+            'await_date_begin' => 'Дата ожидания',
+            'await_date_end' => 'Дата ожидания',
             'payment_type' => 'Оплата',
             'total_payed' => 'Оплачено',
             'total_rest' => 'Остаток',
@@ -80,6 +83,8 @@ class Order extends \yii\db\ActiveRecord
             'delivery_status' => 'Статус поставки',
             'accepted' => 'Принят',
             'created_at' => 'Дата заказа',
+            'created_at_begin' => 'Дата заказа',
+            'created_at_end' => 'Дата заказа',
             'updated_at' => 'Дата обновления',
         ];
     }

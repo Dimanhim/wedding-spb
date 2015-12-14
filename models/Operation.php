@@ -88,6 +88,8 @@ class Operation extends \yii\db\ActiveRecord
             'days' => 'Дни месяца',
             'week' => 'Дни недели',
             'created_at' => 'Дата добавления',
+            'date_start' => 'Период',
+            'date_end' => 'Период',
             'updated_at' => 'Дата обновления',
         ];
     }
@@ -157,12 +159,57 @@ class Operation extends \yii\db\ActiveRecord
         return $days;
     }
 
+    public function getTypeLabel() {
+        switch ($this->type_id) {
+            case self::TYPE_INCOME:
+                return 'доход';
+                break;
+            case self::TYPE_EXPENSE:
+                return 'расход';
+                break;
+            default:
+                return 'неизвестен';
+                break;
+        }
+    }
 
     public function getTypes() {
         return [
             self::TYPE_INCOME => 'доход',
             self::TYPE_EXPENSE => 'расход',
         ];
+    }
+
+    public function getCatLabel() {
+        switch ($this->cat_id) {
+            case self::CAT_BUY:
+                return 'заказы';
+                break;
+            case self::CAT_SELL:
+                return 'продажи';
+                break;
+            case self::CAT_SALARY:
+                return 'ЗП';
+                break;
+            case self::CAT_ADVANCE:
+                return 'аванс';
+                break;
+            case self::CAT_SERVICES:
+                return 'услуги';
+                break;
+            case self::CAT_ADS:
+                return 'реклама';
+                break;
+            case self::CAT_ETC_INCOME:
+                return 'прочие доходы';
+                break;
+            case self::CAT_ETC_EXPENSE:
+                return 'прочие расходы';
+                break;
+            default:
+                return 'неизвестен';
+                break;
+        }
     }
 
     public function getCategories() {
@@ -178,11 +225,77 @@ class Operation extends \yii\db\ActiveRecord
         ];
     }
 
+    public function getPayLabel() {
+        switch ($this->payment_type) {
+            case self::PAY_CASH:
+                return 'наличными';
+                break;
+            case self::PAY_NOCASH:
+                return 'картой';
+                break;
+            default:
+                return 'неизвестен';
+                break;
+        }
+    }
+
     public function getPayments() {
         return [
             self::PAY_CASH => 'наличными',
             self::PAY_NOCASH => 'картой',
         ];
+    }
+
+
+    public function createFromCron() {
+        $schedules = Operation::find()->where(['repeated' => 1])->all();
+        $day = date("j");
+        $month = date("n");
+        $week = date("N");
+        $total_created = 0;
+        foreach ($schedules as $schedule) {
+            $day_ok = false;
+            $month_ok = false;
+            $week_ok = false; 
+            $cron_parts = explode(' ', $schedule->interval);
+
+            //Дни
+            if ($cron_parts[2] == '*') {
+                $day_ok = true;
+            } else {
+                $days = explode(',', $cron_parts[2]);
+                if (in_array($day, $days)) $day_ok = true;
+            }
+
+            //Месяцы
+            if ($cron_parts[3] == '*') {
+                $month_ok = true;
+            } else {
+                $months = explode(',', $cron_parts[3]);
+                if (in_array($month, $months)) $month_ok = true;
+            }
+
+            //Дни недели
+            if ($cron_parts[4] == '*') {
+                $week_ok = true;
+            } else {
+                $weeks = explode(',', $cron_parts[4]);
+                if (in_array($week, $weeks)) $week_ok = true;
+            }
+
+            if($day_ok and $month_ok and $week_ok) {
+                //Добавление в учет
+                $operation = new Operation();
+                $operation->attributes = $schedule->attributes;
+                $operation->repeated = 0;
+                $operation->created_at = time();
+                $operation->updated_at = time();
+                if ($operation->save()) {
+                    $total_created++;
+                }
+            }
+        }
+        return 'Создано операций: '.$total_created;
     }
 
 }

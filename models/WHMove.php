@@ -64,6 +64,8 @@ class WHMove extends \yii\db\ActiveRecord
             'total_amount' => 'Количество',
             'status' => 'Статус',
             'created_at' => 'Дата добавления',
+            'created_at_begin' => 'Дата добавления',
+            'created_at_end' => 'Дата добавления',
             'updated_at' => 'Дата обновления',
         ];
     }

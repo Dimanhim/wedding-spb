@@ -12,10 +12,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>
+    <div class="search_block">
+        <a class="btn btn-primary" role="button" data-toggle="collapse" href="#filter_block" aria-expanded="false" aria-controls="filter_block">Фильтры</a>
         <?= Html::a('Добавить операцию', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-    
+        <?= $this->render('_search', ['model' => $searchModel]); ?>
+    </div>
+
     <table class="table">
         <tr class="active">
             <th></th>
@@ -42,8 +44,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 <td><?= Yii::$app->formatter->asDecimal($operations[date('j', $day)]['day_expense_nal'], 0) ?></td>
                 <td><?= Yii::$app->formatter->asDecimal($operations[date('j', $day)]['day_expense_beznal'], 0) ?></td>
                 <td><?= Yii::$app->formatter->asDecimal($operations[date('j', $day)]['day_summary'], 0) ?></td>
-                <td>-</td>
-                <td>-</td>
+                <td><?= Yii::$app->formatter->asDecimal($operations[date('j', $day)]['day_planned_nal'], 0) ?></td>
+                <td><?= Yii::$app->formatter->asDecimal($operations[date('j', $day)]['day_planned_beznal'], 0) ?></td>
             </tr>
         <?php endforeach ?>
         <tr class="active">
@@ -53,8 +55,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <th><?= Yii::$app->formatter->asDecimal($total['total_expense_nal'], 0) ?></th>
             <th><?= Yii::$app->formatter->asDecimal($total['total_expense_beznal'], 0) ?></th>
             <th><?= Yii::$app->formatter->asDecimal($total['total_summary'], 0) ?></th>
-            <th>-</th>
-            <th>-</th>
+            <th><?= Yii::$app->formatter->asDecimal($total['total_planned_nal'], 0) ?></th>
+            <th><?= Yii::$app->formatter->asDecimal($total['total_planned_beznal'], 0) ?></th>
         </tr>
     </table>
 

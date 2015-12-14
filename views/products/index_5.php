@@ -25,13 +25,13 @@ use yii\helpers\Url;
         ?>
         <tr>
             <td rowspan="4">
-                <?php if (file_exists(\Yii::$app->basePath.'/web'.$product->photo)): ?>
-                    <a href="<?= $product->photo ?>" class="fancybox">
+                <a href="<?= Url::toRoute(['products/view', 'id' => $product->id]) ?>">
+                    <?php if (file_exists(\Yii::$app->basePath.'/web'.$product->photo)): ?>
                         <?= EasyThumbnailImage::thumbnailImg(\Yii::$app->basePath.'/web'.$product->photo,100,150,EasyThumbnailImage::THUMBNAIL_OUTBOUND) ?>
-                    </a>
-                <?php else: ?>
-                    <?= EasyThumbnailImage::thumbnailImg(\Yii::$app->basePath.'/web/files/no_photo.jpg',100,150,EasyThumbnailImage::THUMBNAIL_OUTBOUND) ?>
-                <?php endif ?>
+                    <?php else: ?>
+                        <?= EasyThumbnailImage::thumbnailImg(\Yii::$app->basePath.'/web/files/no_photo.jpg',100,150,EasyThumbnailImage::THUMBNAIL_OUTBOUND) ?>
+                    <?php endif ?>
+                </a>
             </td>
             <td>2к</td>
             <td><?= Yii::$app->formatter->asDecimal($product->purchase_price_small, 0) ?></td>

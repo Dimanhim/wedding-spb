@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model app\models\Operation */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Operations', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Операции', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="operation-view">
@@ -31,17 +31,38 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'name',
             'user_id',
-            'type_id',
-            'cat_id',
-            'payment_type',
-            'total_price',
-            'repeated',
+            [
+                'attribute' => 'type_id',
+                'value' => $model->getTypeLabel(),
+            ],
+            [
+                'attribute' => 'cat_id',
+                'value' => $model->getCatLabel(),
+            ],
+            [
+                'attribute' => 'payment_type',
+                'value' => $model->getPayLabel(),
+            ],
+            [
+                'attribute' => 'total_price',
+                'format'=> ['decimal', 0]
+            ],
+            [
+                'attribute' => 'repeated',
+                'value' => $model->repeated ? 'да' : 'нет',
+            ],
             'interval',
             'months',
             'days',
             'week',
-            'created_at',
-            'updated_at',
+            [
+                'attribute' => 'created_at',
+                'value' => date('d.m.Y H:i', $model->created_at),
+            ],
+            [
+                'attribute' => 'updated_at',
+                'value' => date('d.m.Y H:i', $model->updated_at),
+            ],
         ],
     ]) ?>
 

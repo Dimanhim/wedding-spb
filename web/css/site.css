@@ -95,7 +95,10 @@ a.desc:after {
     padding-top: 32px;
 }
 
-.product-search > a{
+.search_block{
+    margin-top: 20px;
+}
+.search_block > a{
     margin-right: 10px;
     margin-bottom: 10px;
 }
