@@ -13,6 +13,7 @@ class m151118_161409_products extends Migration
 
         $this->createTable('{{%products}}', [
             'id'            => Schema::TYPE_PK,
+            'name'          => Schema::TYPE_STRING,
             'category_id'   => Schema::TYPE_INTEGER . ' NOT NULL',
             'marka_id'      => Schema::TYPE_INTEGER,
             'model_id'      => Schema::TYPE_INTEGER,
@@ -20,6 +21,8 @@ class m151118_161409_products extends Migration
             'ratio_id'      => Schema::TYPE_INTEGER . ' NOT NULL',
             'description'   => Schema::TYPE_STRING,
             'photo'         => Schema::TYPE_STRING,
+            'photo2'         => Schema::TYPE_STRING,
+            'photo3'         => Schema::TYPE_STRING,
             'purchase_price'            => Schema::TYPE_FLOAT,
             'purchase_price_small'      => Schema::TYPE_FLOAT,
             'purchase_price_big'        => Schema::TYPE_FLOAT,
@@ -34,6 +37,7 @@ class m151118_161409_products extends Migration
             'price_big'     => Schema::TYPE_FLOAT,
             'purchase_date' => Schema::TYPE_INTEGER,
             'sell_date'     => Schema::TYPE_INTEGER,
+            'is_deleted'    => Schema::TYPE_BOOLEAN . ' NOT NULL DEFAULT 0',
             'created_at'    => Schema::TYPE_INTEGER . ' NOT NULL',
             'updated_at'    => Schema::TYPE_INTEGER . ' NOT NULL',
         ], $tableOptions);

@@ -8,6 +8,7 @@ use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
+use yii\web\UploadedFile;
 
 /**
  * CategoriesController implements the CRUD actions for Category model.
@@ -22,7 +23,7 @@ class CategoriesController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['@'],
+                        'roles' => ['admin'],
                     ],
                 ],
             ],
@@ -66,7 +67,14 @@ class CategoriesController extends Controller
         $model = new Category();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            $image = UploadedFile::getInstance($model, 'image_field');
+            if ($image) {
+                $image_path = '/files/'.time().'.'. $image->extension;
+                $image->saveAs(\Yii::$app->basePath.'/public_html'.$image_path);
+                $model->image = $image_path;
+            }
+            if ($model->save()) return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(Yii::$app->request->referrer);
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -83,14 +91,36 @@ class CategoriesController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $old_image = $model->image;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            $image = UploadedFile::getInstance($model, 'image_field');
+            if ($image) {
+                $image_path = '/files/'.time().'.'. $image->extension;
+                $image->saveAs(\Yii::$app->basePath.'/public_html'.$image_path);
+                $model->image = $image_path;
+                //Удаление старого фото
+                if ($old_image and file_exists(\Yii::$app->basePath.'/public_html'.$old_image)) 
+                    unlink(\Yii::$app->basePath.'/public_html'.$old_image);
+            }
+            if ($model->save()) return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(Yii::$app->request->referrer);
         } else {
             return $this->render('update', [
                 'model' => $model,
             ]);
         }
+    }
+
+    public function actionDeleteImage($id)
+    {
+        $model = $this->findModel($id);
+        if ($model->image and file_exists(Yii::$app->basePath.'/public_html'.$model->image)) {
+            unlink(Yii::$app->basePath.'/public_html'.$model->image);
+            $model->image = NULL;
+            $model->save(false);
+        }
+        return $this->redirect(Yii::$app->request->referrer);
     }
 
     /**

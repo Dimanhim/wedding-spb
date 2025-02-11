@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\grid\GridView;
 use yii\widgets\DetailView;
 use yii\widgets\ActiveForm;
@@ -79,9 +80,17 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     <?php ActiveForm::end(); ?>
 
+    <?php
+        $receipts->pagination->pageParam = 'receipts-page';
+        $receipts->sort->sortParam = 'receipts-sort';
+
+        $receipt_items->pagination->pageParam = 'receipt_items-page';
+        $receipt_items->sort->sortParam = 'receipt_items-sort';
+    ?>
+
     <h2>Чеки</h2>
     <?= GridView::widget([
-        'dataProvider' => $dataProvider,
+        'dataProvider' => $receipts,
         'summary' => '<div class="summary">Показаны <b>{begin}-{end}</b> из <b>{totalCount}</b> чеков</div>',
         'columns' => [
             'id',
@@ -99,17 +108,64 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\ActionColumn', 'template' => '{view}',
                 'buttons' => [
                     'view' => function ($url, $model, $key) {
-                        return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', $url, ['class' => 'btn btn-primary btn-xs', 'title' => 'Посмотреть']);
+                        return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Url::toRoute(['receipts/view', 'id' => $model->id]), ['class' => 'btn btn-primary btn-xs', 'title' => 'Посмотреть']);
                     },
-                    'delete' => function ($url, $model, $key) {
-                        return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, [
-                            'class' => 'btn btn-danger btn-xs',
-                            'title' => 'Удалить',
-                            'data' => [
-                                'confirm' => 'Вы уверены, что хотите удалить чек?',
-                                'method' => 'post',
-                            ],
-                        ]);
+                ],
+            ],
+        ],
+    ]); ?>
+
+    <h2>Проданные товары</h2>
+    <?= GridView::widget([
+        'dataProvider' => $receipt_items,
+        'summary' => '<div class="summary">Показаны <b>{begin}-{end}</b> из <b>{totalCount}</b> чеков</div>',
+        'columns' => [
+            'id',
+            [
+                'attribute' => 'product_id',
+                'label' => 'Марка',
+                'value'=> function($data) {
+                    return $data->product ? $data->product->marka->name : '-';
+                }
+            ],
+            [
+                'attribute' => 'product_id',
+                'label' => 'Модель',
+                'value'=> function($data) {
+                    return $data->product ? $data->product->model->name : '-';
+                }
+            ],
+            [
+                'attribute' => 'product_id',
+                'label' => 'Цвет',
+                'value'=> function($data) {
+                    return $data->product ? $data->product->color->name : '-';
+                }
+            ],
+            [
+                'attribute' => 'price',
+                'format'=> ['decimal', 0]
+            ],
+            [
+                'attribute' => 'amount',
+                'format'=> ['decimal', 0]
+            ],
+            [
+                'attribute' => 'sale',
+                'format'=> ['decimal', 0]
+            ],
+            [
+                'attribute' => 'gift',
+                'format'=> ['boolean']
+            ],
+            [
+                'attribute' => 'total_price',
+                'format'=> ['decimal', 0]
+            ],
+            ['class' => 'yii\grid\ActionColumn', 'template' => '{view}',
+                'buttons' => [
+                    'view' => function ($url, $model, $key) {
+                        return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', Url::toRoute(['receipts/view', 'id' => $model->id]), ['class' => 'btn btn-primary btn-xs', 'title' => 'Посмотреть']);
                     },
                 ],
             ],

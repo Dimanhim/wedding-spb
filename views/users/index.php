@@ -13,9 +13,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="user-index">
     <h1><?= Html::encode($this->title) ?></h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-    <p>
-        <?= Html::a('Добавить пользователя', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
@@ -24,8 +21,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'username',
             'email:email',
-            'name',
-            'surname',
+            // 'name',
+            // 'surname',
             // 'fathername',
             // 'employment_date',
             // 'auth_key',
@@ -40,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     return date('d.m.Y H:i', $data->created_at);
                 }
             ],
-            ['class' => 'yii\grid\ActionColumn',
+            ['class' => 'yii\grid\ActionColumn', 'template' => '{update}',
                 'buttons' => [
                     'view' => function ($url, $model, $key) {
                         return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', $url, ['class' => 'btn btn-primary btn-xs', 'title' => 'Посмотреть']);

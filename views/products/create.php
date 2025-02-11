@@ -12,7 +12,8 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="product-create">
     <h1><?= Html::encode($this->title) ?></h1>
-    <?= $this->render('_form_'.$category->type, [
+    <?= $this->render('forms/_form_'.$category->type, [
         'model' => $model,
+        'avail_sizes' => $sizes,
     ]) ?>
 </div>

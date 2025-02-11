@@ -10,6 +10,7 @@ use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 use app\models\Category;
 use kartik\alert\AlertBlock;
+use app\widgets\Alert;
 
 AppAsset::register($this);
 ?>
@@ -30,6 +31,7 @@ AppAsset::register($this);
     <?php
     NavBar::begin([
         'brandLabel' => 'Wedding CRM',
+        'innerContainerOptions' => ['class'=>'container-fluid'],
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
@@ -43,43 +45,85 @@ AppAsset::register($this);
             'url' => ['/products/index', 'category_id' => $category->id],
         ];
     }
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav navbar-right'],
-        'items' => [
-            ['label' => 'Товары', 'url' => ['/products/index'], 'items' => $cat_items],
-            ['label' => 'Заказы', 'url' => ['/orders/index']],
-            ['label' => 'Перемещения', 'url' => ['/whmoves/index'], 'items' =>[
-                ['label' => 'Со склада в зал', 'url' => ['/whmoves/index']],
-                ['label' => 'Из зала на склад', 'url' => ['/hwmoves/index']],
-            ]],
-            ['label' => 'Продажи', 'url' => ['/receipts/index']],
-            ['label' => 'Менеджеры', 'url' => ['/managers/index']],
-            ['label' => 'Финансовый учет', 'url' => ['/operations/index']],
-            ['label' => 'Справочники', 'url' => ['/site/contact'], 'items' =>[
-                ['label' => 'Категории', 'url' => ['/categories/index']],
-                ['label' => 'Марки', 'url' => ['/marks/index']],
-                ['label' => 'Модели', 'url' => ['/models/index']],
-                ['label' => 'Цвета', 'url' => ['/colors/index']],
-                ['label' => 'Размеры', 'url' => ['/sizes/index']],
-                ['label' => 'Коэффициенты', 'url' => ['/rates/index']],
-            ]],
-            [
-                'label' => 'Выход',
-                'url' => ['/site/logout'],
-                'linkOptions' => ['data-method' => 'post']
+    if (Yii::$app->user->identity->role == 'admin') {
+        echo Nav::widget([
+            'options' => ['class' => 'navbar-nav navbar-right'],
+            'items' => [
+                ['label' => 'Товары', 'url' => ['/products/index'], 'items' => $cat_items],
+                ['label' => 'Закупки', 'url' => ['/orders/index']],
+                ['label' => 'Перемещения', 'url' => ['/whmoves/index'], 'items' =>[
+                    ['label' => 'Со склада в зал', 'url' => ['/whmoves/index']],
+                    ['label' => 'Из зала на склад', 'url' => ['/hwmoves/index']],
+                ]],
+                ['label' => 'Продажи', 'url' => ['/receipts/index'], 'items' =>[
+                    ['label' => 'Чеки', 'url' => ['/receipts/index']],
+                    ['label' => 'Товары', 'url' => ['/receipts/products']],
+                ]],
+                ['label' => 'Менеджеры', 'url' => ['/managers/index']],
+                ['label' => 'Клиенты', 'url' => ['/clients/index']],
+                ['label' => 'Примерки', 'url' => ['/primerki/index']],
+                ['label' => 'Пароли', 'url' => ['/users/index']],
+                ['label' => 'Финансовый учет', 'url' => ['/operations/index']],
+                ['label' => 'Статьи', 'url' => ['/articles/index'], 'items' =>[
+                    ['label' => 'Список', 'url' => ['/articles/index']],
+                    ['label' => 'Категории', 'url' => ['/article-categories/index']],
+                ]],
+                ['label' => 'Справочники', 'url' => ['/site/contact'], 'items' =>[
+                    ['label' => 'Категории', 'url' => ['/categories/index']],
+                    ['label' => 'Ценовые категории', 'url' => ['/price-categories/index']],
+                    ['label' => 'Марки', 'url' => ['/marks/index']],
+                    ['label' => 'Модели', 'url' => ['/models/index']],
+                    ['label' => 'Цвета', 'url' => ['/colors/index']],
+                    ['label' => 'Цвета для сайта', 'url' => ['/site-colors/index']],
+                    ['label' => 'Размеры', 'url' => ['/sizes/index']],
+                    ['label' => 'Коэффициенты', 'url' => ['/rates/index']],
+                    ['label' => 'Фасоны', 'url' => ['/fashions/index']],
+                    ['label' => 'Особенности', 'url' => ['/features/index']],
+                    ['label' => 'Поводы', 'url' => ['/occasions/index']],
+                    ['label' => 'Статичные страницы', 'url' => ['/static-pages/index']],
+                    ['label' => 'Блокированные IP', 'url' => ['/blacklist/index']],
+                ]],
+                [
+                    'label' => 'Выход',
+                    'url' => ['/site/logout'],
+                    'linkOptions' => ['data-method' => 'post']
+                ],
             ],
-        ],
-    ]);
+        ]);
+    } else {
+        echo Nav::widget([
+            'options' => ['class' => 'navbar-nav navbar-right'],
+            'items' => [
+                ['label' => 'Товары', 'url' => ['/products/index'], 'items' => $cat_items],
+                ['label' => 'Продажи', 'url' => ['/receipts/index']],
+                ['label' => 'Клиенты', 'url' => ['/clients/index']],
+                ['label' => 'Примерки', 'url' => ['/primerki/index']],
+                [
+                    'label' => 'Выход',
+                    'url' => ['/site/logout'],
+                    'linkOptions' => ['data-method' => 'post']
+                ],
+            ],
+        ]);
+    }
     NavBar::end();
     ?>
 
-    <div class="container">
-        <?= AlertBlock::widget([
-            'useSessionFlash' => true,
-            'type' => AlertBlock::TYPE_GROWL
-        ]) ?>
+    <div class="container-fluid">
+        <?php
+        if(Yii::$app->controller->id == 'receipts') {
+            echo Alert::widget();
+        }
+        else {
+            echo AlertBlock::widget([
+                'useSessionFlash' => true,
+                'type' => AlertBlock::TYPE_GROWL
+            ]);
+        }
+        ?>
+
         <?= Breadcrumbs::widget([
-            'homeLink' => [ 
+            'homeLink' => [
                 'label' => 'Главная',
                 'url' => Yii::$app->homeUrl,
             ],

@@ -9,6 +9,7 @@ use app\models\OrderSearch;
 use app\models\OrderItem;
 use app\models\Amount;
 use app\models\Operation;
+use app\models\Mark;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -27,7 +28,7 @@ class OrdersController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['@'],
+                        'roles' => ['admin'],
                     ],
                 ],
             ],
@@ -44,6 +45,7 @@ class OrdersController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         
         return $this->render('index', [
+            'marks' => Mark::find()->asArray()->all(),
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -108,11 +110,13 @@ class OrdersController extends Controller
             $new_order->delivery_status = Order::DELIVERY_INIT;
             if ($new_order->save()) {
                 foreach ($order_items as $order_item) {
+                    $product = Product::findOne($order_item['product_id']);
 
                     //Создаём товар в заказе
                     $new_order_item = new OrderItem();
                     $new_order_item->order_id = $new_order->id;
                     $new_order_item->product_id = $order_item['product_id'];
+                    $new_order_item->marka_id = $product->marka_id;
                     $new_order_item->amount = $order_item['amount'];
                     $new_order_item->price = $order_item['price'];
                     $new_order_item->size_id = $order_item['size_id'];
@@ -120,7 +124,6 @@ class OrdersController extends Controller
                     $new_order_item->save();
 
                     //Ставим дату продажи
-                    $product = Product::findOne($order_item['product_id']);
                     $product->purchase_date = time();
                     $product->save();
                 }
@@ -154,6 +157,7 @@ class OrdersController extends Controller
             //Добавляем операцию в отчет
             $operation = new Operation();
             $operation->name = 'Частичная оплата заказа №'.$order->id;
+            $operation->purchase_price = 0;
             $operation->type_id = Operation::TYPE_EXPENSE;
             $operation->cat_id = Operation::CAT_BUY;
             $operation->payment_type = $post['Order']['payment_type'];
@@ -180,6 +184,7 @@ class OrdersController extends Controller
         //Добавляем операцию в отчет
         $operation = new Operation();
         $operation->name = 'Оплата заказа №'.$order->id;
+        $operation->purchase_price = 0;
         $operation->type_id = Operation::TYPE_EXPENSE;
         $operation->cat_id = Operation::CAT_BUY;
         $operation->payment_type = $post['Order']['payment_type'];
@@ -247,6 +252,26 @@ class OrdersController extends Controller
         }
         $order->save();
 
+        return $this->redirect(Yii::$app->request->referrer);
+    }
+
+    public function actionDeliveryFull($id) {
+        $order = $this->findModel($id);
+        foreach ($order->items as $order_item) {
+            $old_arrived = $order_item->arrived ? $order_item->arrived : 0;
+                    
+            $order_item->delivery_status = OrderItem::DELIVERY_FULL;
+            $order_item->arrived = $order_item->amount;
+            $order->delivery_status = Order::DELIVERY_PART;
+
+            //Меняем кол-во на складе и в ожидании
+            $diff_arived = $order_item->arrived - $old_arrived;
+            $order->acceptOrderItem($order_item, Amount::TYPE_WAREHOUSE, $diff_arived, true);
+            $order->acceptOrderItem($order_item, Amount::TYPE_WAIT, $diff_arived, false);
+            $order_item->save();
+        }
+        $order->delivery_status = Order::DELIVERY_FULL;
+        $order->save();
         return $this->redirect(Yii::$app->request->referrer);
     }
 

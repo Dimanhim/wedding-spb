@@ -67,7 +67,7 @@ class OperationSearch extends Operation
             'id' => $this->id,
             'user_id' => $this->user_id,
             'type_id' => $this->type_id,
-            'cat_id' => $this->cat_id,
+            //'cat_id' => $this->cat_id,
             'payment_type' => $this->payment_type,
             'repeated' => $this->repeated,
             'total_price' => $this->total_price,

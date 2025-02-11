@@ -28,6 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'category_id',
             'name',
+            'site_color_id',
             [
                 'attribute' => 'created_at',
                 'value' => date('d.m.Y H:i', $model->created_at),
@@ -39,3 +40,10 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
 </div>
+
+<h2>Товары</h2>
+<ol>
+    <?php foreach ($products as $product): ?>
+        <li><?= Html::a($product->name, ['/products/view', 'id' => $product->id]) ?></li>
+    <?php endforeach ?>
+</ol>

@@ -1,9 +1,14 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use kartik\form\ActiveForm;
 use kartik\builder\Form;
 use kartik\date\DatePicker;
+use app\models\Manager;
+use app\models\Mark;
+use app\models\Category;
+use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\ProductSearch */
@@ -14,7 +19,7 @@ use kartik\date\DatePicker;
     <div class="well">
         <?php
             $form = ActiveForm::begin([
-                'action' => ['index'],
+                'action' => Url::to(),
                 'method' => 'get',
             ]);
             echo Form::widget([
@@ -22,10 +27,25 @@ use kartik\date\DatePicker;
                 'form' => $form,
                 'columns' => 12,
                 'attributes' => [
+                    'manager_id' => [
+                        'columnOptions' => ['colspan' => 12],
+                        'type' => Form::INPUT_WIDGET, 
+                        'widgetClass' => '\kartik\widgets\Select2', 
+                        'options' => [
+                            'data' => ArrayHelper::map(Manager::find()->orderBy('name ASC')->all(), 'id', function($model, $defaultValue) {
+                                return $model['surname'].' '.$model['name'];
+                            }),
+                            'options' => ['placeholder' => 'Все менеджеры'],
+                            'pluginOptions' => [
+                                'allowClear' => true
+                            ],
+                        ],
+                        'hint' => 'Выберите менеджера из списка'
+                    ],
                     'created_at_begin' => [
                         'type' => Form::INPUT_WIDGET,
                         'widgetClass' => '\kartik\date\DatePicker',
-                        'columnOptions' => ['colspan' => 6],
+                        'columnOptions' => ['colspan' => 12],
                         'options' => [
                             'language' => 'ru',
                             'attribute' => 'created_at_begin',
@@ -41,7 +61,7 @@ use kartik\date\DatePicker;
             ]);
         ?>
         <div class="form-group text-right">
-            <?= Html::a('Сбросить', ['index'], ['class' => 'btn btn-default']) ?>
+            <?= Html::a('Сбросить', Url::to(), ['class' => 'btn btn-default']) ?>
             <?= Html::submitButton('Найти', ['class' => 'btn btn-primary']) ?>
         </div>
         <?php ActiveForm::end(); ?>

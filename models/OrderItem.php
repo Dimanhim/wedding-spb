@@ -10,6 +10,7 @@ use yii\behaviors\TimestampBehavior;
  *
  * @property integer $id
  * @property integer $product_id
+ * @property integer $marka_id
  * @property integer $order_id
  * @property integer $size_id
  * @property integer $amount
@@ -46,7 +47,7 @@ class OrderItem extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['order_id', 'product_id', 'amount', 'price', 'delivery_status'], 'required'],
+            [['order_id', 'product_id', 'marka_id', 'amount', 'price', 'delivery_status'], 'required'],
             [['order_id', 'product_id', 'size_id', 'amount', 'delivery_status', 'arrived', 'created_at', 'updated_at'], 'integer'],
             [['price'], 'number']
         ];
@@ -102,6 +103,7 @@ class OrderItem extends \yii\db\ActiveRecord
             'id' => 'Id',
             'order_id' => 'Заказ', 
             'product_id' => 'Товар',
+            'marka_id' => 'Марка',
             'size_id' => 'Размер',
             'amount' => 'Количество',
             'price' => 'Сумма',

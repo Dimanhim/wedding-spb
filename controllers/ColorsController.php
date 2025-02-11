@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Color;
+use app\models\Product;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -22,7 +23,7 @@ class ColorsController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['@'],
+                        'roles' => ['admin'],
                     ],
                 ],
             ],
@@ -53,6 +54,7 @@ class ColorsController extends Controller
     {
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'products' => Product::find()->where(['color_id' => $id])->all(),
         ]);
     }
 
@@ -66,7 +68,7 @@ class ColorsController extends Controller
         $model = new Color();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -85,7 +87,7 @@ class ColorsController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         } else {
             return $this->render('update', [
                 'model' => $model,

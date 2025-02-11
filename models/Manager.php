@@ -107,6 +107,11 @@ class Manager extends \yii\db\ActiveRecord
         return $this->hasMany(Receipt::className(), ['manager_id' => 'id']);
     }
 
+    public function getReceiptItems()
+    {
+        return $this->hasMany(ReceiptItem::className(), ['receipt_id' => 'id'])->via('receipts');
+    }
+
     // Helpers
     public function getFio()
     {

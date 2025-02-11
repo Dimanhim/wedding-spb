@@ -19,6 +19,7 @@ class m151211_102358_operations extends Migration
             'cat_id'        => Schema::TYPE_INTEGER . ' NOT NULL',
             'payment_type'  => Schema::TYPE_INTEGER . ' NOT NULL',
             'total_price'   => Schema::TYPE_FLOAT . ' NOT NULL',
+            'purchase_price'   => Schema::TYPE_FLOAT . ' NOT NULL',
             'repeated'      => Schema::TYPE_BOOLEAN . ' NOT NULL DEFAULT 0',
             'interval'      => Schema::TYPE_STRING,
             'months'        => Schema::TYPE_STRING,

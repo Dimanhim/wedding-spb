@@ -6,6 +6,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use app\models\Amount;
 use app\models\OrderItem;
+use app\models\Mark;
 
 /**
  * This is the model class for table "orders".
@@ -36,6 +37,8 @@ class Order extends \yii\db\ActiveRecord
     const DELIVERY_PART = 2;
     const DELIVERY_FULL = 3;
 
+    public $marka_id;
+
 
     /**
      * @inheritdoc
@@ -59,7 +62,7 @@ class Order extends \yii\db\ActiveRecord
     {
         return [
             [['await_date', 'payment_type', 'total_amount', 'total_price', 'payment_status', 'delivery_status'], 'required'],
-            [['await_date', 'payment_type', 'total_amount', 'payment_status', 'delivery_status', 'created_at', 'updated_at', 'accepted'], 'integer'],
+            [['await_date', 'payment_type', 'total_amount', 'payment_status', 'delivery_status', 'created_at', 'updated_at', 'accepted', 'marka_id'], 'integer'],
             [['total_payed', 'total_rest', 'total_price'], 'number']
         ];
     }
@@ -86,6 +89,7 @@ class Order extends \yii\db\ActiveRecord
             'created_at_begin' => 'Дата заказа',
             'created_at_end' => 'Дата заказа',
             'updated_at' => 'Дата обновления',
+            'marka_id' => 'Марка',
         ];
     }
 
@@ -95,6 +99,13 @@ class Order extends \yii\db\ActiveRecord
     public function getItems()
     {
         return $this->hasMany(OrderItem::className(), ['order_id' => 'id']);
+    }
+
+    public function getMarka()
+    {
+        foreach ($this->items as $item) {
+            return $item->product->marka->name;
+        }
     }
 
     /**

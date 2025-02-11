@@ -53,38 +53,68 @@ class OperationsController extends Controller
         $operations = [];
         $days = [];
 
+        $total_purchase_price = 0;
         $total_income_nal = 0;
         $total_income_beznal = 0;
         $total_expense_nal = 0;
         $total_expense_beznal = 0;
         $total_planned_nal = 0;
         $total_planned_beznal = 0;
-        $total_summary = 0;
+        $total_summary_nal = 0;
+        $total_summary_beznal = 0;
+
+        $all_operations = Operation::find()->where(['between', 'created_at', $date_start, $date_end + 86399])->all();
+        $operationNames = [];
 
         while($timestamp <= $date_end) {
             $beginOfDay = strtotime("midnight", $timestamp);
             $endOfDay   = strtotime("tomorrow", $beginOfDay) - 1;
 
+            $day_purchase_price = 0;
             $day_income_nal = 0;
             $day_income_beznal = 0;
             $day_expense_nal = 0;
             $day_expense_beznal = 0;
             $day_planned_nal = 0;
             $day_planned_beznal = 0;
-            $day_summary = 0;
+            $day_summary_nal = 0;
+            $day_summary_beznal = 0;
             //$day_operations = Operation::find()->where(['between', 'created_at', $beginOfDay, $endOfDay])->andWhere(['!=', 'repeated', 1])->all();
-            $day_operations = Operation::find()->where(['between', 'created_at', $beginOfDay, $endOfDay])->all();
+
+            // $day_operations = Operation::find()->where(['between', 'created_at', $beginOfDay, $endOfDay]);
+            // if (isset($_GET['OperationSearch']['cat_id'])) {
+            //     $day_operations->andWhere(['in', 'cat_id', explode(',', $_GET['OperationSearch']['cat_id'])]);
+            // }
+
+            $day_operations = array_filter($all_operations, function($item) use ($beginOfDay, $endOfDay) {
+                if (isset($_GET['OperationSearch']['cat_id'])) {
+                    return $item['created_at'] >= $beginOfDay and $item['created_at'] < $endOfDay and in_array($item['cat_id'], explode(',', $_GET['OperationSearch']['cat_id']));
+                } else {
+                    return $item['created_at'] >= $beginOfDay and $item['created_at'] < $endOfDay;
+                }
+            });
+
             foreach ($day_operations as $day_operation) {
+                if (!in_array($day_operation->name, $operationNames)) {
+                    $operationNames[] = $day_operation->name;
+                    $day_purchase_price += $day_operation->purchase_price;
+                    $total_purchase_price += $day_operation->purchase_price;
+                }
+
                 if ($day_operation->type_id == Operation::TYPE_INCOME) {
                     if ($day_operation->payment_type == Operation::PAY_CASH) {
                         $day_income_nal += $day_operation->total_price;
                         $total_income_nal += $day_operation->total_price;
+
+                        $day_summary_nal += $day_operation->total_price;
+                        $total_summary_nal += $day_operation->total_price;
                     } else {
                         $day_income_beznal += $day_operation->total_price;
                         $total_income_beznal += $day_operation->total_price;
+
+                        $day_summary_beznal += $day_operation->total_price;
+                        $total_summary_beznal += $day_operation->total_price;
                     }
-                    $day_summary += $day_operation->total_price;
-                    $total_summary += $day_operation->total_price;
                 } else {
                     if ($day_operation->payment_type == Operation::PAY_CASH) {
                         if ($day_operation->repeated) {
@@ -93,6 +123,9 @@ class OperationsController extends Controller
                         } else {
                             $day_expense_nal += $day_operation->total_price;
                             $total_expense_nal += $day_operation->total_price;
+
+                            $day_summary_nal -= $day_operation->total_price;
+                            $total_summary_nal -= $day_operation->total_price;
                         }
                     } else {
                         if ($day_operation->repeated) {
@@ -101,23 +134,23 @@ class OperationsController extends Controller
                         } else {
                             $day_expense_beznal += $day_operation->total_price;
                             $total_expense_beznal += $day_operation->total_price;
+
+                            $day_summary_beznal -= $day_operation->total_price;
+                            $total_summary_beznal -= $day_operation->total_price;
                         }
-                    }
-                    //Плюсуем к итого, только если не запланирована
-                    if (!$day_operation->repeated) {
-                        $day_summary -= $day_operation->total_price;
-                        $total_summary -= $day_operation->total_price;
                     }
                 }
             }
-            $operations[date('j', $timestamp)] = [
+            $operations[date('Y', $timestamp)][date('n', $timestamp)][date('j', $timestamp)] = [
+                'day_purchase_price' => $day_purchase_price,
                 'day_income_nal' => $day_income_nal,
                 'day_income_beznal' => $day_income_beznal,
                 'day_expense_nal' => $day_expense_nal,
                 'day_expense_beznal' => $day_expense_beznal,
                 'day_planned_nal' => $day_planned_nal,
                 'day_planned_beznal' => $day_planned_beznal,
-                'day_summary' => $day_summary,
+                'day_summary_nal' => $day_summary_nal,
+                'day_summary_beznal' => $day_summary_beznal,
             ];
             
             $days[] = $timestamp;
@@ -129,13 +162,15 @@ class OperationsController extends Controller
             'operations' => $operations,
             'days' => $days,
             'total' => [
+                'total_purchase_price' => $total_purchase_price,
                 'total_income_nal' => $total_income_nal,
                 'total_income_beznal' => $total_income_beznal,
                 'total_expense_nal' => $total_expense_nal,
                 'total_expense_beznal' => $total_expense_beznal,
                 'total_planned_nal' => $total_planned_nal,
                 'total_planned_beznal' => $total_planned_beznal,
-                'total_summary' => $total_summary,
+                'total_summary_nal' => $total_summary_nal,
+                'total_summary_beznal' => $total_summary_beznal,
             ]
         ]);
     }
@@ -145,10 +180,18 @@ class OperationsController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionView($id)
+    public function actionView($day)
     {
+        $beginOfDay = strtotime("midnight", strtotime($day));
+        $endOfDay   = strtotime("tomorrow", $beginOfDay) - 1;
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => Operation::find()->where(['between', 'created_at', $beginOfDay, $endOfDay]),
+        ]);
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'dataProvider' => $dataProvider,
+            'day' => $day,
         ]);
     }
 
@@ -160,8 +203,11 @@ class OperationsController extends Controller
     public function actionCreate()
     {
         $model = new Operation();
+        $model->purchase_price = 0;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            if (!$model->user_id) $model->user_id = Yii::$app->user->id;
+            $model->save();
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
@@ -186,7 +232,7 @@ class OperationsController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['view', 'day' => date('d.m.Y', $model->created_at)]);
         } else {
             return $this->render('update', [
                 'model' => $model,

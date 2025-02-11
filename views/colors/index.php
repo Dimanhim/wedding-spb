@@ -21,6 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'category_id',
             'name',
+            'site_color_id',
             [
                 'attribute' => 'created_at',
                 'value'=> function($data) {

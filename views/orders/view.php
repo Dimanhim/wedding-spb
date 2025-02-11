@@ -9,16 +9,15 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\Order */
 
-$this->title = 'Заказ №'.$model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Заказы', 'url' => ['index']];
+$this->title = 'Закупка №'.$model->id;
+$this->params['breadcrumbs'][] = ['label' => 'Закупки', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="order-view">
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1><?= Html::encode($this->title) ?> <?= Html::a('Печать', 'javascript: print();', ['class' => 'btn btn-primary pull-right', 'title' => 'Печать']) ?></h1>
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
             [
                 'attribute' => 'created_at',
                 'value' => date('d.m.Y', $model->created_at),
@@ -82,20 +81,22 @@ $this->params['breadcrumbs'][] = $this->title;
             'options' => ['class' => 'order_update_form']
         ]);
     ?>
-    <table class="table">
+    <table class="table not_for_print">
         <tr>
             <th></th>
+            <th>Марка</th>
             <th>Модель</th>
             <th>Цвет</th>
             <th>Размер</th>
             <th>Кол-во</th>
             <th>Цена</th>
             <th>Статус</th>
-            <th>Кол-во</th>
+            <th>Пришло</th>
         </tr>
         <?php foreach ($model->items as $order_item): ?>
             <tr>
                 <td><?= $order_item->id ?></td>
+                <td><?= $order_item->product->marka->name ?></td>
                 <td><?= $order_item->product->model->name ?></td>
                 <td><?= $order_item->product->color->name ?></td>
                 <td><?= $order_item->size->name ?></td>
@@ -143,6 +144,35 @@ $this->params['breadcrumbs'][] = $this->title;
             <th><?= date('d.m.Y', $model->await_date) ?></th>
             <th></th>
             <th></th>
+            <th></th>
+            <th>Итого</th>
+            <th><?= $model->total_price ?></th>
+        </tr>
+    </table>
+
+    <table class="table for_print">
+        <tr>
+            <th></th>
+            <th>Модель</th>
+            <th>Цвет</th>
+            <th>Размер</th>
+            <th>Кол-во</th>
+            <th>Цена</th>
+        </tr>
+        <?php foreach ($model->items as $order_item): ?>
+            <tr>
+                <td><?= $order_item->id ?></td>
+                <td><?= $order_item->product->model->name ?></td>
+                <td><?= $order_item->product->color->name ?></td>
+                <td><?= $order_item->size->name ?></td>
+                <td><?= $order_item->amount ?></td>
+                <td><?= $order_item->price ?></td>
+            </tr>
+        <?php endforeach ?>
+        <tr class="active">
+            <th></th>
+            <th>Дата ожидания</th>
+            <th><?= date('d.m.Y', $model->await_date) ?></th>
             <th></th>
             <th>Итого</th>
             <th><?= $model->total_price ?></th>

@@ -18,8 +18,11 @@ class m151203_210400_receipts extends Migration
             'price'             => Schema::TYPE_FLOAT . ' NOT NULL',
             'sale'              => Schema::TYPE_FLOAT . ' NOT NULL',
             'total_price'       => Schema::TYPE_FLOAT . ' NOT NULL',
+            'cash_total'        => Schema::TYPE_FLOAT,
+            'nocash_total'      => Schema::TYPE_FLOAT,
             'change'            => Schema::TYPE_FLOAT,
             'manager_id'        => Schema::TYPE_INTEGER . ' NOT NULL',
+            'is_closed'         => Schema::TYPE_BOOLEAN . ' NOT NULL DEFAULT 0',
             'created_at'        => Schema::TYPE_INTEGER . ' NOT NULL',
             'updated_at'        => Schema::TYPE_INTEGER . ' NOT NULL',
         ], $tableOptions);

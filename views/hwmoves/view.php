@@ -14,11 +14,10 @@ $this->params['breadcrumbs'][] = ['label' => 'Перемещения из зал
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="hwmove-view">
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1><?= Html::encode($this->title) ?> <?= Html::a('Печать', 'javascript: print();', ['class' => 'btn btn-primary pull-right', 'title' => 'Печать']) ?></h1>
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
             [
                 'attribute' => 'created_at',
                 'value' => date('d.m.Y', $model->created_at),
@@ -51,7 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'options' => ['class' => 'hwmoves_update_form']
         ]);
     ?>
-    <table class="table">
+    <table class="table not_for_print">
         <tr>
             <th></th>
             <th>Модель</th>
@@ -102,6 +101,25 @@ $this->params['breadcrumbs'][] = $this->title;
                         ]);
                     ?>
                 </td>
+            </tr>
+        <?php endforeach ?>
+    </table>
+
+    <table class="table for_print">
+        <tr>
+            <th></th>
+            <th>Модель</th>
+            <th>Цвет</th>
+            <th>Размер</th>
+            <th>Кол-во</th>
+        </tr>
+        <?php foreach ($model->items as $move_item): ?>
+            <tr>
+                <td><?= $move_item->id ?></td>
+                <td><?= $move_item->product->model->name ?></td>
+                <td><?= $move_item->product->color->name ?></td>
+                <td><?= $move_item->size->name ?></td>
+                <td><?= $move_item->amount ?></td>
             </tr>
         <?php endforeach ?>
     </table>

@@ -19,10 +19,14 @@ class AppAsset extends AssetBundle
     public $baseUrl = '@web';
     public $css = [
         'fancybox/source/jquery.fancybox.css',
+        'css/jquery.datetimepicker.min.css',
         'css/site.css',
     ];
     public $js = [
         'fancybox/source/jquery.fancybox.pack.js',
+        'js/jquery.json.min.js',
+        'js/mask.js',
+        'js/jquery.datetimepicker.full.min.js',
         'js/script.js',
     ];
     public $depends = [

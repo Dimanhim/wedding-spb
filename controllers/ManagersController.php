@@ -23,7 +23,7 @@ class ManagersController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['@'],
+                        'roles' => ['admin'],
                     ],
                 ],
             ],
@@ -62,12 +62,18 @@ class ManagersController extends Controller
             $manager->save();
         }
 
-        $dataProvider = new ActiveDataProvider([
+        $receipts = new ActiveDataProvider([
             'query' => $manager->getReceipts(),
         ]);
+
+        $receipt_items = new ActiveDataProvider([
+            'query' => $manager->getReceiptItems(),
+        ]);
+
         return $this->render('view', [
             'model' => $manager,
-            'dataProvider' => $dataProvider,
+            'receipts' => $receipts,
+            'receipt_items' => $receipt_items,
         ]);
     }
 
@@ -88,7 +94,12 @@ class ManagersController extends Controller
             $user->status = 10;
             $user->email = $post['Manager']['email'];
             $user->setPassword($post['Manager']['password']);
+            $user->generateAuthKey();
             if ($user->save()) {
+                $auth = Yii::$app->authManager;
+                $userRole = $auth->getRole('manager');
+                $auth->assign($userRole, $user->id);
+
                 $manager->load($post);
                 $manager->user_id = $user->id;
                 if ($manager->save()) {

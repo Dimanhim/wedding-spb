@@ -15,6 +15,7 @@ use yii\behaviors\TimestampBehavior;
  * @property integer $cat_id
  * @property integer $payment_type
  * @property double $total_price
+ * @property double $purchase_price
  * @property integer $repeated
  * @property string $interval
  * @property string $months
@@ -36,6 +37,8 @@ class Operation extends \yii\db\ActiveRecord
     const CAT_ADS           = 6;
     const CAT_ETC_INCOME    = 7;
     const CAT_ETC_EXPENSE   = 8;
+    const CAT_SEWER         = 9;
+    const CAT_SEWER_SALARY  = 10;
 
     const PAY_CASH = 1;
     const PAY_NOCASH = 2;
@@ -61,9 +64,9 @@ class Operation extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'type_id', 'cat_id', 'payment_type', 'total_price'], 'required'],
+            [['name', 'type_id', 'cat_id', 'payment_type', 'total_price', 'purchase_price'], 'required'],
             [['user_id', 'type_id', 'cat_id', 'payment_type', 'repeated', 'created_at', 'updated_at'], 'integer'],
-            [['total_price'], 'number'],
+            [['total_price', 'purchase_price'], 'number'],
             [['name', 'interval'], 'string', 'max' => 255],
             [['months', 'days', 'week'], 'safe']
         ];
@@ -77,22 +80,32 @@ class Operation extends \yii\db\ActiveRecord
         return [
             'id' => 'Id',
             'name' => 'Название',
-            'user_id' => 'Пользователь',
+            'user_id' => 'Менеджер',
             'type_id' => 'Тип',
             'cat_id' => 'Категория',
-            'payment_type' => 'Способ оплаты',
+            'payment_type' => 'Оплата',
             'total_price' => 'Сумма',
-            'repeated' => 'Запланирована',
+            'purchase_price' => 'Закупка',
+            'repeated' => 'План',
             'interval' => 'Интервал',
             'months' => 'Месяцы',
             'days' => 'Дни месяца',
             'week' => 'Дни недели',
-            'created_at' => 'Дата добавления',
+            'created_at' => 'Дата',
             'date_start' => 'Период',
             'date_end' => 'Период',
             'updated_at' => 'Дата обновления',
         ];
     }
+
+    /**
+    * Relations
+    */
+    public function getManager()
+    {
+        return $this->hasOne(Manager::className(), ['id' => 'user_id']);
+    }
+
 
     public function beforeSave($insert) {
         if (parent::beforeSave($insert)) {
@@ -206,6 +219,12 @@ class Operation extends \yii\db\ActiveRecord
             case self::CAT_ETC_EXPENSE:
                 return 'прочие расходы';
                 break;
+            case self::CAT_SEWER:
+                return 'швея';
+                break;
+            case self::CAT_SEWER_SALARY:
+                return 'швея ЗП';
+                break;
             default:
                 return 'неизвестен';
                 break;
@@ -222,6 +241,8 @@ class Operation extends \yii\db\ActiveRecord
             self::CAT_ADS => 'реклама',
             self::CAT_ETC_INCOME => 'прочие доходы',
             self::CAT_ETC_EXPENSE => 'прочие расходы',
+            self::CAT_SEWER => 'швея',
+            self::CAT_SEWER_SALARY => 'швея ЗП',
         ];
     }
 
@@ -287,6 +308,7 @@ class Operation extends \yii\db\ActiveRecord
                 //Добавление в учет
                 $operation = new Operation();
                 $operation->attributes = $schedule->attributes;
+                $operation->purchase_price = 0;
                 $operation->repeated = 0;
                 $operation->created_at = time();
                 $operation->updated_at = time();

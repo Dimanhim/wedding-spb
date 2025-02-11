@@ -17,7 +17,13 @@ use app\models\Color;
 use app\models\Rate;
 use app\models\Amount;
 use app\models\Size;
-use app\models\OrderItem;
+use app\models\ReceiptItem;
+use app\models\ProductPriceCategory;
+use app\models\ProductFashion;
+use app\models\ProductFeature;
+use app\models\ProductOccasion;
+use yii\data\Sort;
+use himiklab\thumbnail\EasyThumbnailImage;
 
 /**
  * ProductsController implements the CRUD actions for Product model.
@@ -32,11 +38,32 @@ class ProductsController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['@'],
+                        'roles' => ['admin', 'manager'],
                     ],
                 ],
             ],
         ];
+    }
+
+    public function actionRename() {
+        foreach (Product::find()->where(['name' => null])->all() as $product) {
+            //$product->scenario = 'type_7';
+            $product_name = '';
+            if ($product->marka) $product_name .= $product->marka->name.' ';
+            if ($product->model) $product_name .= $product->model->name.' ';
+            if ($product->color) $product_name .= $product->color->name.' ';
+            $product->name = trim($product_name);
+            $product->save();
+        }
+    }
+
+    public function actionResetStat() {
+        foreach (Product::find()->all() as $product) {
+            $product->total_show = 0;
+            $product->total_like = 0;
+            $product->save(false);
+        }
+        return 'Счетчики просмотров и лайков сброшены';
     }
 
     /**
@@ -45,16 +72,35 @@ class ProductsController extends Controller
      */
     public function actionIndex($category_id)
     {
+        $sort = new Sort([
+            'attributes' => [
+                'position' => ['label' => 'Сортировать по позиции'],
+                'model_id' => ['label' => 'Сортировать по модели'],
+            ],
+        ]);
+
+        Yii::$app->session->set('products_filter', Yii::$app->request->queryString);
+
         $category = Category::findOne($category_id);
         $searchModel = new ProductSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        $sizes = Size::find()->where(['category_id' => $category_id])->all();
+        if (!count($sizes)) {
+            $sizes = Size::find()->where('ISNULL(category_id)')->all();
+        }
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'pagination' => $dataProvider->getPagination(),
             'category' => $category,
-            'sizes' => Size::find()->all(),
+            'sizes' => $sizes,
+            'colors' => Color::find()->asArray()->all(),
+            'rates' => Rate::find()->asArray()->all(),
+            'marks' => Mark::find()->asArray()->all(),
+            'amounts' => Amount::find()->asArray()->all(),
+            'sort' => $sort,
         ]);
     }
 
@@ -66,13 +112,19 @@ class ProductsController extends Controller
     public function actionView($id)
     {
         $model = $this->findModel($id);
+
+        $sizes = Size::find()->where(['category_id' => $model->category_id])->all();
+        if (!count($sizes)) {
+            $sizes = Size::find()->where('ISNULL(category_id)')->all();
+        }
+
         return $this->render('view', [
             'model' => $model,
             'category' => $model->category,
-            'sizes' => Size::find()->all(),
+            'sizes' => $sizes,
             'dataProvider' => new ActiveDataProvider([
-                //'query' => OrderItem::find()->where(['product_id' => $id])->groupBy(['order_id']),
-                'query' => OrderItem::find()->where(['product_id' => $id]),
+                //'query' => ReceiptItem::find()->where(['product_id' => $id])->groupBy(['order_id']),
+                'query' => ReceiptItem::find()->where(['product_id' => $id]),
             ]),
         ]);
     }
@@ -88,6 +140,7 @@ class ProductsController extends Controller
         $category = Category::findOne($category_id);
         $model->scenario = 'type_'.$category->type;
         $model->category_id = $category_id;
+        $model->position = 0;
 
         $post = Yii::$app->request->post();
         if ($model->load($post)) {
@@ -136,11 +189,45 @@ class ProductsController extends Controller
             $model->photo_file = UploadedFile::getInstance($model, 'photo');
             if ($model->photo_file) {
                 $image_path = '/files/'.time().'.'. $model->photo_file->extension;
-                $model->photo_file->saveAs(\Yii::$app->basePath.'/web'.$image_path);
+                $model->photo_file->saveAs(\Yii::$app->basePath.'/public_html'.$image_path);
                 $model->photo = $image_path;
             }
 
+            //Загрузка фото2
+            $model->photo_file2 = UploadedFile::getInstance($model, 'photo2');
+            if ($model->photo_file2) {
+                $image_path = '/files/'.time().'2.'. $model->photo_file2->extension;
+                $model->photo_file2->saveAs(\Yii::$app->basePath.'/public_html'.$image_path);
+                $model->photo2 = $image_path;
+            }
+
+            //Загрузка фото3
+            $model->photo_file3 = UploadedFile::getInstance($model, 'photo3');
+            if ($model->photo_file3) {
+                $image_path = '/files/'.time().'3.'. $model->photo_file3->extension;
+                $model->photo_file3->saveAs(\Yii::$app->basePath.'/public_html'.$image_path);
+                $model->photo3 = $image_path;
+            }
+
             if ($model->save()) {
+                $product_name = '';
+                if ($model->marka) $product_name .= $model->marka->name.' ';
+                if ($model->model) $product_name .= $model->model->name.' ';
+                if ($model->color) $product_name .= $model->color->name.' ';
+                $model->name = trim($product_name);
+                // Проверка на дубликат
+                if ($model->model_id > 1000) {
+                    $search_arr = ['category_id' => $model->category_id, 'marka_id' => $model->marka_id, 'model_id' => ($model->model_id - 1000)];
+                    if ($model->color_id) $search_arr['color_id'] = $model->color_id;
+                    $dublicat = Product::findOne($search_arr);
+                    if ($dublicat and $dublicat->id != $model->id) {
+                        $model->modifier = 1;
+                    } else {
+                        $model->modifier = 0;
+                    }
+                }
+                $model->save();
+
                 //Сохранение кол-ва
                 if (isset($post['Product']['amount'])) {
                     foreach ($post['Product']['amount'] as $amount_key => $amount_value) {
@@ -162,11 +249,58 @@ class ProductsController extends Controller
                         }
                     }
                 }
+
+                //Сохранение ценовых категорий
+                if (isset($post['Product']['price_category'])) {
+                    foreach ($post['Product']['price_category'] as $price_category) {
+                        $new_price_category = new ProductPriceCategory();
+                        $new_price_category->product_id = $model->id;
+                        $new_price_category->price_category_id = $price_category;
+                        $new_price_category->save();
+                    }
+                }
+
+                //Сохранение фасонов
+                if (isset($post['Product']['fashion'])) {
+                    foreach ($post['Product']['fashion'] as $fashion) {
+                        $new_fashion = new ProductFashion();
+                        $new_fashion->product_id = $model->id;
+                        $new_fashion->fashion_id = $fashion;
+                        $new_fashion->save();
+                    }
+                }
+
+                //Сохранение особенностей
+                if (isset($post['Product']['feature'])) {
+                    foreach ($post['Product']['feature'] as $feature) {
+                        $new_feature = new ProductFeature();
+                        $new_feature->product_id = $model->id;
+                        $new_feature->feature_id = $feature;
+                        $new_feature->save();
+                    }
+                }
+
+                //Сохранение поводов
+                if (isset($post['Product']['occasion'])) {
+                    foreach ($post['Product']['occasion'] as $occasion) {
+                        $new_occasion = new ProductOccasion();
+                        $new_occasion->product_id = $model->id;
+                        $new_occasion->occasion_id = $occasion;
+                        $new_occasion->save();
+                    }
+                }
+
                 return $this->redirect(['index', 'category_id' => $model->category->id]);
             }
         } else {
+            $sizes = Size::find()->where(['category_id' => $category_id])->all();
+            if (!count($sizes)) {
+                $sizes = Size::find()->where('ISNULL(category_id)')->all();
+            }
+
             return $this->render('create', [
                 'model' => $model,
+                'sizes' => $sizes,
                 'category' => $category,
             ]);
         }
@@ -182,12 +316,25 @@ class ProductsController extends Controller
         //Дублирование фото
         if ($model->photo) {
             $new_filename = '/files/'.time().'.'. pathinfo($model->photo, PATHINFO_EXTENSION);
-            if (copy(\Yii::$app->basePath.'/web'.$model->photo, \Yii::$app->basePath.'/web'.$new_filename)) {
+            if (copy(\Yii::$app->basePath.'/public_html'.$model->photo, \Yii::$app->basePath.'/public_html'.$new_filename)) {
                 $clone->photo = $new_filename;
             }
         }
 
         if ($clone->save()) {
+            // Проверка на дубликат
+            if ($clone->model_id > 1000) {
+                $search_arr = ['category_id' => $clone->category_id, 'marka_id' => $clone->marka_id, 'model_id' => ($clone->model_id - 1000)];
+                if ($clone->color_id) $search_arr['color_id'] = $clone->color_id;
+                $dublicat = Product::findOne($search_arr);
+                if ($dublicat and $dublicat->id != $model->id) {
+                    $clone->modifier = 1;
+                } else {
+                    $clone->modifier = 0;
+                }
+                $clone->save();
+            }
+
             //Сохранение кол-ва
             foreach (Amount::find()->where(['product_id' => $id])->all() as $amount_obj) {
                 $new_amount = new Amount();
@@ -195,8 +342,6 @@ class ProductsController extends Controller
                 $new_amount->product_id = $clone->id;
                 $new_amount->save();
             }
-        } else {
-            Yii::info(print_r($clone->getErrors(), true));
         }
 
         return $this->redirect(['index', 'category_id' => $model->category->id]);
@@ -213,6 +358,8 @@ class ProductsController extends Controller
         $model = $this->findModel($id);
         $model->scenario = 'type_'.$model->category->type;
         $old_photo = $model->photo;
+        $old_photo2 = $model->photo2;
+        $old_photo3 = $model->photo3;
         $post = Yii::$app->request->post();
         if ($model->load($post)) {
 
@@ -259,18 +406,62 @@ class ProductsController extends Controller
             $model->photo_file = UploadedFile::getInstance($model, 'photo');
             if ($model->photo_file) {
                 $image_path = '/files/'.time().'.'. $model->photo_file->extension;
-                $model->photo_file->saveAs(\Yii::$app->basePath.'/web'.$image_path);
+                $model->photo_file->saveAs(\Yii::$app->basePath.'/public_html'.$image_path);
                 $model->photo = $image_path;
                 //Удаление старого фото
-                if ($old_photo) unlink(\Yii::$app->basePath.$old_photo);
+                if ($old_photo and file_exists(\Yii::$app->basePath.'/public_html'.$old_photo)) 
+                    unlink(\Yii::$app->basePath.'/public_html'.$old_photo);
             } else {
                 $model->photo = $old_photo;
             }
 
+            //Загрузка фото2
+            $model->photo_file2 = UploadedFile::getInstance($model, 'photo2');
+            if ($model->photo_file2) {
+                $image_path = '/files/'.time().'2.'. $model->photo_file2->extension;
+                $model->photo_file2->saveAs(\Yii::$app->basePath.'/public_html'.$image_path);
+                $model->photo2 = $image_path;
+                //Удаление старого фото
+                if ($old_photo2 and file_exists(\Yii::$app->basePath.'/public_html'.$old_photo2)) 
+                    unlink(\Yii::$app->basePath.'/public_html'.$old_photo2);
+            } else {
+                $model->photo2 = $old_photo2;
+            }
+
+            //Загрузка фото3
+            $model->photo_file3 = UploadedFile::getInstance($model, 'photo3');
+            if ($model->photo_file3) {
+                $image_path = '/files/'.time().'3.'. $model->photo_file3->extension;
+                $model->photo_file3->saveAs(\Yii::$app->basePath.'/public_html'.$image_path);
+                $model->photo3 = $image_path;
+                //Удаление старого фото
+                if ($old_photo3 and file_exists(\Yii::$app->basePath.'/public_html'.$old_photo3)) 
+                    unlink(\Yii::$app->basePath.'/public_html'.$old_photo3);
+            } else {
+                $model->photo3 = $old_photo3;
+            }
+
             if ($model->save()) {
-                //Удаление старого кол-ва
-                Amount::deleteAll(['product_id' => $id]);
+                $product_name = '';
+                if ($model->marka) $product_name .= $model->marka->name.' ';
+                if ($model->model) $product_name .= $model->model->name.' ';
+                if ($model->color) $product_name .= $model->color->name.' ';
+                $model->name = trim($product_name);
+                // Проверка на дубликат
+                if ($model->model_id > 1000) {
+                    $search_arr = ['category_id' => $model->category_id, 'marka_id' => $model->marka_id, 'model_id' => ($model->model_id - 1000)];
+                    if ($model->color_id) $search_arr['color_id'] = $model->color_id;
+                    $dublicat = Product::findOne($search_arr);
+                    if ($dublicat and $dublicat->id != $model->id) {
+                        $model->modifier = 1;
+                    } else {
+                        $model->modifier = 0;
+                    }
+                }
+                $model->save();
+
                 //Сохранение кол-ва
+                Amount::deleteAll(['product_id' => $id]);
                 if (isset($post['Product']['amount'])) {
                     foreach ($post['Product']['amount'] as $amount_key => $amount_value) {
                         if (is_array($amount_value)) {
@@ -291,14 +482,90 @@ class ProductsController extends Controller
                         }
                     }
                 }
-                return $this->redirect(['index', 'category_id' => $model->category->id]);
+
+                //Сохранение ценовых категорий
+                ProductPriceCategory::deleteAll(['product_id' => $id]);
+                if (isset($post['Product']['price_category'])) {
+                    foreach ($post['Product']['price_category'] as $price_category) {
+                        $new_price_category = new ProductPriceCategory();
+                        $new_price_category->product_id = $model->id;
+                        $new_price_category->price_category_id = $price_category;
+                        $new_price_category->save();
+                    }
+                }
+
+                //Сохранение силуэтов
+                ProductFashion::deleteAll(['product_id' => $id]);
+                if (isset($post['Product']['fashion'])) {
+                    foreach ($post['Product']['fashion'] as $fashion) {
+                        $new_fashion = new ProductFashion();
+                        $new_fashion->product_id = $model->id;
+                        $new_fashion->fashion_id = $fashion;
+                        $new_fashion->save();
+                    }
+                }
+
+                //Сохранение особенностей
+                ProductFeature::deleteAll(['product_id' => $id]);
+                if (isset($post['Product']['feature'])) {
+                    foreach ($post['Product']['feature'] as $feature) {
+                        $new_feature = new ProductFeature();
+                        $new_feature->product_id = $model->id;
+                        $new_feature->feature_id = $feature;
+                        $new_feature->save();
+                    }
+                }
+
+                //Сохранение поводов
+                ProductOccasion::deleteAll(['product_id' => $id]);
+                if (isset($post['Product']['occasion'])) {
+                    foreach ($post['Product']['occasion'] as $occasion) {
+                        $new_occasion = new ProductOccasion();
+                        $new_occasion->product_id = $model->id;
+                        $new_occasion->occasion_id = $occasion;
+                        $new_occasion->save();
+                    }
+                }
+
+                if (Yii::$app->session->get('products_filter')) {
+                    return $this->redirect(['index?'.Yii::$app->session->get('products_filter')]);
+                } else {
+                    return $this->redirect(['index', 'category_id' => $model->category->id]);
+                }
             }
         } else {
+            $sizes = Size::find()->where(['category_id' => $model->category_id])->all();
+            if (!count($sizes)) {
+                $sizes = Size::find()->where('ISNULL(category_id)')->all();
+            }
+
             return $this->render('update', [
                 'model' => $model,
+                'sizes' => $sizes,
                 'category' => $model->category,
             ]);
         }
+    }
+
+    public function actionBarcode($id)
+    {
+        $model = Product::findByBarcode($id);
+        //if ($model) {
+            return $this->renderAjax('barcode', [
+                'barcode' => $id,
+                'model' => $model
+            ]);
+        //} else {
+        //    Yii::$app->session->setFlash('find_by_barcode_error', 'Товар не найден');
+        //    return $this->redirect(Yii::$app->request->referrer);
+        //}
+    }
+
+    public function actionPrintCodes($codes = '')
+    {
+        return $this->renderAjax('print_codes', [
+            'codes' => explode('-', $codes),
+        ]);
     }
 
     /**
@@ -307,16 +574,44 @@ class ProductsController extends Controller
      * @param integer $id
      * @return mixed
      */
+    // public function actionDelete($id)
+    // {
+    //     $model = $this->findModel($id);
+    //     $old_photo = $model->photo;
+    //     $model->delete();
+    //     //Удаление кол-ва
+    //     Amount::deleteAll(['product_id' => $id]);
+    //     //Удаление старого фото
+    //     if ($old_photo) unlink(\Yii::$app->basePath.'/public_html'.$old_photo);
+
+    //     return $this->redirect(['index', 'category_id' => $model->category->id]);
+    // }
+
+
+    public function actionDeleteImage($id, $name = 'photo')
+    {
+        $model = $this->findModel($id);
+        if ($model->$name and file_exists(Yii::$app->basePath.'/public_html'.$model->$name)) {
+            unlink(Yii::$app->basePath.'/public_html'.$model->$name);
+            $model->$name = NULL;
+            $model->save(false);
+        }
+        return $this->redirect(Yii::$app->request->referrer);
+    }
+
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
-        $old_photo = $model->photo;
-        $model->delete();
-        //Удаление кол-ва
-        Amount::deleteAll(['product_id' => $id]);
-        //Удаление старого фото
-        if ($old_photo) unlink(\Yii::$app->basePath.'/web'.$old_photo);
+        $model->is_deleted = true;
+        $model->save(false);
+        return $this->redirect(['index', 'category_id' => $model->category->id]);
+    }
 
+    public function actionRestore($id)
+    {
+        $model = $this->findModel($id);
+        $model->is_deleted = false;
+        $model->save(false);
         return $this->redirect(['index', 'category_id' => $model->category->id]);
     }
 
@@ -334,5 +629,110 @@ class ProductsController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+    
+
+
+
+    public function actionGenerateFid()
+    {
+        $str_main = '';
+        $str_double = [];
+        if($models = Product::find()->all()) {
+            $str_main .= "id; title; description; availability; condition; price; link; image_link; brand\r\n";
+            foreach($models as $model) {
+                $str = '';
+                if($model->amounts) {
+                    foreach($model->amounts as $product_amount) {
+                        $product_id = $this->getProductId($model, $product_amount);
+                        $str .= $model->name.';';
+                        $str .= $this->getProductDescription($model, $product_amount).';';
+                        $str .= $this->getAvaliability($product_amount).';';
+                        $str .= 'new;';
+                        $str .= $model->price ? $model->price.' RUB;' : $model->price_small.' RUB;';
+                        $str .= 'https://wedding-spb.ru/catalog/view/'.$model->id.';';
+                        $str .= $this->getProductImageLink($model).';';
+                        $str .= $this->getMarka($model).';';
+                        $str .= "\r\n";
+                        if(!in_array($str, $str_double)) {
+                            if($str) {
+                                $str_main .= $product_id.';'.$str;
+                                $str_double[] = $str;
+                            }
+                        }
+                        $str = '';
+                    }
+                } else {
+                    $product_id = $model->id;
+                    $str .= $model->name.';';
+                    $str .= $this->getProductDescription($model).';';
+                    $str .= ';';
+                    $str .= 'new;';
+                    $str .= $model->price ? $model->price.' RUB;' : $model->price_small.' RUB;';
+                    $str .= 'https://wedding-spb.ru/catalog/view/'.$model->id.';';
+                    $str .= $this->getProductImageLink($model).';';
+                    $str .= $this->getMarka($model).';';
+                    $str .= "\r\n";
+                }
+                if(!in_array($str, $str_double)) {
+                    if($str) {
+                        $str_main .= $product_id.';'.$str;
+                        $str_double[] = $str;
+                    }
+                }
+            }
+            Yii::$app->response->sendContentAsFile($str_main, 'fid.csv');
+        }
+    }
+    public function getMarka($model)
+    {
+        return $model->marka ? $model->marka->name : '';
+    }
+    public function getProductDescription($model, $amount = null)
+    {
+        $str = '';
+        if($model->category) {
+            $str .= ' '.$model->category->name;
+        }
+        if($amount && $amount->size) {
+            $str .= ' размер - '.$amount->size->name;
+        }
+        if($model->model) {
+            $str .= ' модель - '.$model->model->name;
+        }
+        if($model->color) {
+            $str .= ' цвет - '.$model->color->name;
+        }
+        if($model->description) {
+            $str .= ' '.$model->description;
+        }
+
+        return $str;
+    }
+    public function getAvaliability($amount)
+    {
+        $str = 'in stock';
+        if($amount) {
+            switch($amount->amount_type) {
+                case Amount::TYPE_HALL : $str = 'in stock';
+                    break;
+                case Amount::TYPE_WAREHOUSE : $str = 'in stock';
+                    break;
+                case Amount::TYPE_WAIT : $str = 'available for order';
+                    break;
+            }
+        }
+        return $str;
+    }
+    public function getProductId($model, $amount = null)
+    {
+        return $model->id.'-'.$amount->id;
+    }
+    public function getProductImageLink($model)
+    {
+        if($model->photo) {
+            return 'https://wedding-spb.ru'.$model->photo;
+        }
+        return '';
     }
 }

@@ -1,9 +1,10 @@
 <?php
 use kartik\datecontrol\Module;
 $params = require(__DIR__ . '/params.php');
-
+Yii::setAlias('admin-root', '/home/p/polbatonam/public_html');
 $config = [
     'id' => 'basic',
+    'language' => 'ru-RU',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'components' => [
@@ -51,6 +52,7 @@ $config = [
             'decimalSeparator' => ',',
             'thousandSeparator' => ' ',
             'currencyCode' => 'RUB',
+            'nullDisplay' => '<span class="not_set">-</span>',
         ],
     ],
     'modules' => [
@@ -95,13 +97,15 @@ if (YII_ENV_DEV) {
     $config['bootstrap'][] = 'debug';
     $config['modules']['debug'] = [
         'class' => 'yii\debug\Module',
-        'allowedIPs' => ['127.0.0.1', '::1', '192.168.0.*', '94.242.18.138', '188.187.2.206', $_SERVER['REMOTE_ADDR']],
+        'allowedIPs' => ['*'],
+        //'allowedIPs' => ['127.0.0.1', '::1', '192.168.0.*', '94.242.18.138'],
     ];
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
         'class' => 'yii\gii\Module',
-        'allowedIPs' => ['127.0.0.1', '::1', '192.168.0.*', '94.242.18.138', '188.187.2.206'],
+        'allowedIPs' => ['*'],
+        //'allowedIPs' => ['127.0.0.1', '::1', '192.168.0.*', '94.242.18.138'],
     ];
 }
 

@@ -29,6 +29,8 @@ use yii\helpers\Security;
  */
 class User extends ActiveRecord implements IdentityInterface
 {
+    public $password;
+    public $password_copy;
     /**
      * @inheritdoc
      */
@@ -55,7 +57,9 @@ class User extends ActiveRecord implements IdentityInterface
             [['username', 'email', 'password_hash', 'password_reset_token', 'email_confirm_token', 'role'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
             [['email'], 'unique'],
-            [['username'], 'unique']
+            [['username'], 'unique'],
+            ['password_copy', 'compare', 'compareAttribute' => 'password', 'message' => 'Пароли не совпадают'],
+            [['password_copy', 'password'], 'string', 'min' => 6, 'tooShort' => 'Пароль должен содержать не менее 6 символов'],
         ];
     }
 
@@ -82,6 +86,8 @@ class User extends ActiveRecord implements IdentityInterface
             'email_confirm_token' => 'Email Confirm Token',
             'role' => 'Роль',
             'status' => 'Статус',
+            'password' => 'Новый пароль',
+            'password_copy' => 'Повторите пароль',
             'created_at' => 'Дата добавления',
             'updated_at' => 'Дата обновления',
         ];

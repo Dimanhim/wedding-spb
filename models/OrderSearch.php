@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\Order;
+use app\models\OrderItem;
 
 /**
  * OrderSearch represents the model behind the search form about `app\models\Order`.
@@ -23,7 +24,7 @@ class OrderSearch extends Order
     public function rules()
     {
         return [
-            [['id', 'await_date', 'payment_type', 'total_amount', 'payment_status', 'delivery_status', 'created_at', 'updated_at', 'accepted'], 'integer'],
+            [['id', 'await_date', 'payment_type', 'total_amount', 'payment_status', 'delivery_status', 'created_at', 'updated_at', 'accepted', 'marka_id'], 'integer'],
             [['created_at_begin', 'created_at_end', 'await_date_begin', 'await_date_end'], 'safe'],
             [['total_payed', 'total_rest', 'total_price'], 'number'],
         ];
@@ -47,8 +48,9 @@ class OrderSearch extends Order
      */
     public function search($params)
     {
+        //$query = Order::find()->select('`orders`.*, `order_items`.`product_id`')->leftJoin('order_items', 'orders.id = order_items.order_id');
         $query = Order::find();
-
+        
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
@@ -62,6 +64,11 @@ class OrderSearch extends Order
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
+        }
+
+        if ($this->marka_id) {
+            $order_ids = OrderItem::find()->select('order_id')->where(['marka_id' => $this->marka_id])->distinct()->asArray()->column();
+            $query->andFilterWhere(['in', 'id', $order_ids]);
         }
 
         $query->andFilterWhere([

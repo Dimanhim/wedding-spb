@@ -7,7 +7,7 @@ use yii\helpers\Html;
 
 $this->title = 'Редактирование операции: ' . ' ' . $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Операции', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
+//$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Редактирование';
 ?>
 <div class="operation-update">

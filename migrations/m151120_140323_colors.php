@@ -14,6 +14,7 @@ class m151120_140323_colors extends Migration
         $this->createTable('{{%colors}}', [
             'id'            => Schema::TYPE_PK,
             'category_id'   => Schema::TYPE_INTEGER,
+            'site_color_id' => Schema::TYPE_INTEGER,
             'name'          => Schema::TYPE_STRING . ' NOT NULL',
             'created_at'    => Schema::TYPE_INTEGER . ' NOT NULL',
             'updated_at'    => Schema::TYPE_INTEGER . ' NOT NULL',

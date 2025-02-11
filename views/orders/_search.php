@@ -4,6 +4,8 @@ use yii\helpers\Html;
 use kartik\form\ActiveForm;
 use kartik\builder\Form;
 use kartik\date\DatePicker;
+use app\models\Mark;
+use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\ProductSearch */
@@ -22,6 +24,19 @@ use kartik\date\DatePicker;
                 'form' => $form,
                 'columns' => 12,
                 'attributes' => [
+                    'marka_id' => [
+                        'columnOptions' => ['colspan' => 12],
+                        'type' => Form::INPUT_WIDGET, 
+                        'widgetClass' => '\kartik\widgets\Select2', 
+                        'options' => [
+                            'data' => ArrayHelper::map(Mark::find()->orderBy('name ASC')->all(), 'id', 'name'),
+                            'options' => ['placeholder' => 'Все марки'],
+                            'pluginOptions' => [
+                                'allowClear' => true
+                            ],
+                        ],
+                        'hint' => 'Выберите марку из списка'
+                    ],
                     'created_at_begin' => [
                         'type' => Form::INPUT_WIDGET,
                         'widgetClass' => '\kartik\date\DatePicker',

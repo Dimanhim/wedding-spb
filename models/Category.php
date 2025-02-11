@@ -11,11 +11,14 @@ use yii\behaviors\TimestampBehavior;
  * @property integer $id
  * @property string $name
  * @property integer $type
+ * @property string $image
  * @property integer $created_at
  * @property integer $updated_at
  */
 class Category extends \yii\db\ActiveRecord
 {
+    public $image_field;
+
     /**
      * @inheritdoc
      */
@@ -39,7 +42,8 @@ class Category extends \yii\db\ActiveRecord
         return [
             [['name', 'type'], 'required'],
             [['type', 'created_at', 'updated_at'], 'integer'],
-            [['name'], 'string', 'max' => 255]
+            [['name', 'image'], 'string', 'max' => 255],
+            ['image_field', 'file'],
         ];
     }
 
@@ -52,6 +56,8 @@ class Category extends \yii\db\ActiveRecord
             'id' => 'Id',
             'name' => 'Название',
             'type' => 'Тип',
+            'image' => 'Изображение',
+            'image_field' => 'Изображение',
             'created_at' => 'Дата добавления',
             'updated_at' => 'Дата изменения',
         ];

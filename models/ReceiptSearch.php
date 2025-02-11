@@ -49,8 +49,9 @@ class ReceiptSearch extends Receipt
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort'=> ['defaultOrder' => ['id' => SORT_DESC]],
             'pagination' => [
-                'pageSize' => 30,
+                'pageSize' => 0,
             ],
         ]);
 
@@ -62,25 +63,27 @@ class ReceiptSearch extends Receipt
             return $dataProvider;
         }
 
-        $query->andFilterWhere([
-            'id' => $this->id,
-            'payment_type' => $this->payment_type,
-            'total_amount' => $this->total_amount,
-            'manager_id' => $this->manager_id,
-            'price' => $this->price,
-            'sale' => $this->sale,
-            'total_price' => $this->total_price,
-            'change' => $this->change,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-        ]);
+        if (!$this->created_at_begin) $this->created_at_begin = date('01.m.Y');
+        if (!$this->created_at_end) $this->created_at_end = date('t.m.Y');
 
-        if ($created_at_begin_unix = strtotime($this->created_at_begin)) {
-            $query->andFilterWhere(['>=', 'created_at', $created_at_begin_unix]);
-        }
-        if ($created_at_end_unix = strtotime($this->created_at_end)) {
-            $query->andFilterWhere(['<=', 'created_at', ($created_at_end_unix + 86399)]);
-        }
+        //if (!$this->created_at_begin) $this->created_at_begin = '01.01.2023';
+        //if (!$this->created_at_end) $this->created_at_end = date('t.m.Y');
+
+        $query->andFilterWhere(['>=', 'created_at', strtotime($this->created_at_begin)]);
+        $query->andFilterWhere(['<=', 'created_at', strtotime($this->created_at_end) + 86399]);
+
+        $query->andFilterWhere([
+            // 'id' => $this->id,
+            // 'payment_type' => $this->payment_type,
+            // 'total_amount' => $this->total_amount,
+            'manager_id' => $this->manager_id,
+            // 'price' => $this->price,
+            // 'sale' => $this->sale,
+            // 'total_price' => $this->total_price,
+            // 'change' => $this->change,
+            // 'created_at' => $this->created_at,
+            // 'updated_at' => $this->updated_at,
+        ]);
 
         return $dataProvider;
     }

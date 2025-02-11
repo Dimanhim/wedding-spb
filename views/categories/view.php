@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use himiklab\thumbnail\EasyThumbnailImage;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Category */
@@ -22,6 +23,12 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
     </p>
+    <?php if ($model->image): ?>
+        <h3>Изображение</h3>
+        <div class="old_img" style="margin-bottom: 20px;">
+            <?= EasyThumbnailImage::thumbnailImg(Yii::$app->basePath.'/public_html'.$model->image, 100, 150, EasyThumbnailImage::THUMBNAIL_OUTBOUND) ?>
+        </div>
+    <?php endif ?>
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [

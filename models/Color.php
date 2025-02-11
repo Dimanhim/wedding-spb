@@ -10,6 +10,7 @@ use yii\behaviors\TimestampBehavior;
  *
  * @property integer $id
  * @property integer $category_id
+ * @property integer $site_color_id
  * @property string $name
  * @property integer $created_at
  * @property integer $updated_at
@@ -37,7 +38,7 @@ class Color extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['category_id', 'created_at', 'updated_at'], 'integer'],
+            [['category_id', 'created_at', 'updated_at', 'site_color_id'], 'integer'],
             [['name'], 'required'],
             [['name'], 'string', 'max' => 255]
         ];
@@ -51,6 +52,7 @@ class Color extends \yii\db\ActiveRecord
         return [
             'id' => 'Id',
             'category_id' => 'Категория',
+            'site_color_id' => 'Цвет на сайте',
             'name' => 'Название',
             'created_at' => 'Дата добавления',
             'updated_at' => 'Дата изменения',
